@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>MM Math — алгоритм принятия решений</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{--bg:#0d0f14;--card:#161b25;--border:#1f2a3a;--accent:#00c4ff;--green:#00e57a;--red:#ff4f6a;--yellow:#ffc93c;--purple:#b66aff;--text:#e4eaf2;--muted:#6b7a8f}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;font-size:14px;line-height:1.6}
+.container{max-width:1400px;margin:0 auto;padding:20px}
+h1{font-size:20px;font-weight:700;color:var(--accent)}
+h2{font-size:15px;font-weight:600;color:var(--accent);margin-bottom:10px;padding-left:10px;border-left:3px solid var(--accent)}
+h3{font-size:13px;font-weight:600;color:var(--yellow);margin-bottom:6px}
+.header{text-align:center;padding:24px 0 16px;border-bottom:1px solid var(--border);margin-bottom:18px}
+.subtitle{color:var(--muted);font-size:12px;margin-top:4px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.stat-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 16px;flex:1;min-width:130px;text-align:center}
+.stat-label{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.5px}
+.stat-val{font-size:20px;font-weight:700}
+.stat-sub{font-size:11px;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:#1a2236;color:var(--muted);font-weight:500;padding:5px 8px;text-align:right;border-bottom:1px solid var(--border);font-size:10px;text-transform:uppercase;white-space:nowrap}
+th:first-child{text-align:left}
+td{padding:4px 8px;border-bottom:1px solid #1a1f2a;text-align:right;font-size:11px}
+td:first-child{text-align:left}
+tr:hover td{background:#1a2236}
+.buy{color:var(--green)} .sell{color:var(--red)} .net{color:var(--yellow)} .neutral{color:var(--muted)}
+canvas{max-height:260px}
+.mermaid{font-size:12px}
+.formula{background:#0a1420;border:1px solid var(--border);border-radius:6px;padding:12px 16px;margin:8px 0;font-family:monospace;font-size:13px;line-height:1.8}
+.formula span{color:var(--yellow)}
+.formula .comment{color:var(--muted);font-size:11px}
+.hl-green{background:#1a3a20;border-left:3px solid var(--green);padding:9px 12px;border-radius:0 6px 6px 0;margin:8px 0;font-size:12px}
+.hl-red{background:#3a0010;border-left:3px solid var(--red);padding:9px 12px;border-radius:0 6px 6px 0;margin:8px 0;font-size:12px}
+.hl-yellow{background:#3a2000;border-left:3px solid var(--yellow);padding:9px 12px;border-radius:0 6px 6px 0;margin:8px 0;font-size:12px}
+.badge{display:inline-block;padding:1px 7px;border-radius:4px;font-size:11px;font-weight:600}
+.b-buy{background:#1a3a20;color:#00e57a;border:1px solid #00e57a44}
+.b-sell{background:#3a0010;color:#ff4f6a;border:1px solid #ff4f6a44}
+.b-neutral{background:#1a1f2a;color:#6b7a8f;border:1px solid #2a3040}
+.big-number{font-size:28px;font-weight:700}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>Математика MM-алгоритма — почему T1 прибыльный, T2 убыточный и как решение об выходе</h1>
+  <div class="subtitle">Два токена, одни кошельки, разный результат — анализ P&L и логики органика vs команда</div>
+</div>
+
+<!-- STAT ROW -->
+<div class="stat-row">
+  <div class="stat"><div class="stat-label">T1 Net Realized P&L</div><div class="stat-val buy">+73.9 SOL</div><div class="stat-sub">+$6,818 · команда в ПРОФИТЕ</div></div>
+  <div class="stat"><div class="stat-label">T2 Net Realized P&L</div><div class="stat-val sell">−138 SOL</div><div class="stat-sub">−$12,734 · команда в УБЫТКЕ</div></div>
+  <div class="stat"><div class="stat-label">T1 Organic Net Flow</div><div class="stat-val sell">−75 SOL</div><div class="stat-sub">органика NET ПРОДАВАЛА</div></div>
+  <div class="stat"><div class="stat-label">T2 Organic Net Flow</div><div class="stat-val sell">−117 SOL</div><div class="stat-sub">органика ПРОДАВАЛА сильнее</div></div>
+  <div class="stat"><div class="stat-label">T1 Sell-mode Start</div><div class="stat-val net">мин 15</div><div class="stat-sub">MC=$55,315 → начали дистрибуцию</div></div>
+  <div class="stat"><div class="stat-label">T2 Sell-mode Start</div><div class="stat-val net">мин 37</div><div class="stat-sub">MC=$31,615 → только 2 мин продаж</div></div>
+</div>
+
+<!-- CORE INSIGHT -->
+<div class="card">
+  <h2>Главный вывод: откуда берётся прибыль</h2>
+  <div class="grid2">
+    <div>
+      <div class="hl-green">
+        <b>T1 прибыльный (+73.9 SOL)</b> потому что:<br>
+        → Органика <i>в итоге</i> создала достаточно покупок ($37k–$67k)<br>
+        → С мин.15 команда начала NET_SELL в растущий рынок<br>
+        → Дамп: 91 SELL при MC=$67k → забирают всё сразу<br>
+        → Снайперы (Wallet_117, 113 и др.) купили при MC=$3k, продали при $67k = +4 SOL каждый
+      </div>
+      <div class="hl-red">
+        <b>T2 убыточный (−138 SOL)</b> потому что:<br>
+        → Органика ПОСТОЯННО продавала больше, чем покупала<br>
+        → Команда была вынуждена поглощать продажи каждую минуту<br>
+        → NET_SELL режим включился только 2 раза (мин.12 и мин.37)<br>
+        → MC никогда не достиг стандартного $69k → меньше прибыли со снайперов
+      </div>
+    </div>
+    <div>
+      <div class="hl-yellow">
+        <b>Почему мигрировали при $34.54k а не $69k:</b><br><br>
+        Миграция на pump_swap = стоимость ~20 SOL из пула<br>
+        Алгоритм считает: <code>tokens_held × current_price ≥ loss + 20 SOL</code><br><br>
+        При T2: потеряно ~138 SOL в торговле. Если ждать $69k — нужно ещё ~100 SOL в покупках поддержки. Лучше зафиксировать убыток на $34.54k, чем потерять ещё 100 SOL.<br><br>
+        <b>Триггер выхода = (ожидаемая_органика × оставшееся_время) &lt; текущий_убыток</b>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MATHEMATICAL FRAMEWORK -->
+<div class="card">
+  <h2>Математическая модель алгоритма</h2>
+  <div class="grid2">
+    <div>
+      <h3>Переменные состояния (обновляются каждый слот)</h3>
+      <div class="formula">
+<span>net_realized</span> = Σ(sell_sol) − Σ(buy_sol)
+<span>tokens_held</span>  = Σ(buy_tok) − Σ(sell_tok)
+<span>unrealized</span>   = tokens_held × current_price
+<span>total_pnl</span>    = net_realized + unrealized
+
+<span>org_flow_1m</span>  = Σ(org_buy) − Σ(org_sell)
+                <span class="comment">за последние 60 секунд</span>
+
+<span>org_flow_5m</span>  = rolling sum org_net за 5 мин
+      </div>
+    </div>
+    <div>
+      <h3>Условия переключения режима</h3>
+      <div class="formula">
+IF org_flow_1m > <span>+2 SOL</span>:
+   mode = <span class="buy">SELL</span>   <span class="comment"># органика берёт → продаём</span>
+
+ELIF org_flow_1m < <span>-2 SOL</span>:
+   mode = <span class="sell">BUY</span>    <span class="comment"># органика сливает → поглощаем</span>
+
+ELIF mc > <span>target_mc × 0.80</span>:
+   mode = <span class="buy">SELL</span>   <span class="comment"># выше 80% цели → тоже продаём</span>
+
+ELSE:
+   mode = <span class="neutral">NEUTRAL</span> <span class="comment"># одинаково buy/sell</span>
+      </div>
+    </div>
+  </div>
+  <div class="grid2" style="margin-top:8px">
+    <div>
+      <h3>Условие EXIT (дамп)</h3>
+      <div class="formula">
+exit_condition = (
+   mc >= <span>target_mc × 0.98</span>        <span class="comment"># близко к цели</span>
+   AND org_flow_5m < <span>threshold_low</span>  <span class="comment"># органика слабеет</span>
+   AND net_realized > <span>migration_cost</span>  <span class="comment"># покрыли миграцию</span>
+)
+      </div>
+      <div class="hl-green" style="margin-top:8px">
+        T1: net_realized НЕ превышал +20 SOL до самого дампа. Но tokens_held × $67k было достаточно → total_pnl был положительным. Алгоритм смотрит на TOTAL, не только realized.
+      </div>
+    </div>
+    <div>
+      <h3>Условие EARLY EXIT (T2 сценарий)</h3>
+      <div class="formula">
+early_exit = (
+   org_flow_5m < <span>−10 SOL</span>           <span class="comment"># органика сильно продаёт</span>
+   AND total_pnl deteriorating      <span class="comment"># P&L ухудшается</span>
+   AND time_since_launch > <span>30 мин</span>   <span class="comment"># достаточно времени</span>
+)
+→ MIGRATE at current_mc (даже ниже target)
+      </div>
+      <div class="hl-red" style="margin-top:8px">
+        T2: organic net = −117 SOL за 40 мин. Алгоритм понял что органика не придёт. Мигрировал при $34.54k чтобы не терять больше.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHARTS -->
+<div class="grid2">
+  <div class="card">
+    <h2>T1: P&L команды и органика по минутам</h2>
+    <canvas id="chartT1pnl"></canvas>
+    <div style="font-size:11px;color:var(--muted);margin-top:6px">
+      <span style="color:var(--accent)">─</span> MC ($) · 
+      <span style="color:var(--green)">─</span> Team P&L (SOL) · 
+      <span style="color:var(--red)">─</span> Org net (SOL)
+    </div>
+  </div>
+  <div class="card">
+    <h2>T2: P&L команды и органика по минутам</h2>
+    <canvas id="chartT2pnl"></canvas>
+    <div style="font-size:11px;color:var(--muted);margin-top:6px">
+      <span style="color:var(--green)">─</span> MC ($) · 
+      <span style="color:var(--accent)">─</span> Team P&L (SOL) · 
+      <span style="color:var(--red)">─</span> Org net (SOL, rolling)
+    </div>
+  </div>
+</div>
+
+<!-- DECISION TABLE T1 -->
+<div class="card">
+  <h2>Таблица решений T1 — пошагово по минутам</h2>
+  <table>
+    <tr><th>Мин</th><th>MC</th><th>Org Net</th><th>Team P&L</th><th>Org B</th><th>Org S</th><th>Tm B</th><th>Tm S</th><th>Режим</th><th>Логика</th></tr>
+    <tbody id="tableT1"></tbody>
+  </table>
+</div>
+
+<!-- DECISION TABLE T2 -->
+<div class="card">
+  <h2>Таблица решений T2 — пошагово (первые 40 мин)</h2>
+  <table>
+    <tr><th>Мин</th><th>MC</th><th>Org Net</th><th>Team P&L</th><th>Org B</th><th>Org S</th><th>Tm B</th><th>Tm S</th><th>Режим</th><th>Логика</th></tr>
+    <tbody id="tableT2"></tbody>
+  </table>
+</div>
+
+<!-- FLOWCHART -->
+<div class="card">
+  <h2>Алгоритм принятия решений (уточнённый)</h2>
+  <div class="mermaid">
+flowchart TD
+    TICK([Каждый слот ~400ms]) --> CALC
+
+    CALC["Обновить переменные:\nnet_realized = Σsell − Σbuy\ntokens_held × price = unrealized\ntotal_pnl = realized + unrealized\norg_flow_1m = rolling 60s org net"]
+
+    CALC --> MODE_CHECK
+
+    MODE_CHECK{"org_flow_1m?"}
+
+    MODE_CHECK -->|"> +2 SOL\nОрганика покупает"| SELL_MODE
+    MODE_CHECK -->|"< -2 SOL\nОрганика продаёт"| BUY_MODE
+    MODE_CHECK -->|"нейтрально"| MC_CHECK
+
+    SELL_MODE["NET_SELL режим\nПродаём в органическую покупку\nsize = MC × 0.11%\n1-2 кошелька"]
+    BUY_MODE["NET_BUY режим\nПокупаем, поглощаем слив\nsize = MC × 0.06%\n1-3 кошелька"]
+
+    MC_CHECK{"MC > 80% target?"}
+    MC_CHECK -->|"Да"| SELL_MODE
+    MC_CHECK -->|"Нет"| NEUTRAL
+
+    NEUTRAL["NEUTRAL\nMM: равные buy/sell\nМинимальный спред"]
+
+    SELL_MODE --> EXIT_CHECK
+    BUY_MODE --> EXIT_CHECK
+    NEUTRAL --> EXIT_CHECK
+
+    EXIT_CHECK{"Проверка выхода"}
+
+    EXIT_CHECK -->|"MC ≥ 98% target\nAND org_5m слабеет\nAND total_pnl > 0"| STANDARD_EXIT
+    EXIT_CHECK -->|"org_5m < -10 SOL\nAND total_pnl ухудшается\nAND time > 30 мин"| EARLY_EXIT
+    EXIT_CHECK -->|"нет"| WAIT
+
+    STANDARD_EXIT[["СТАНДАРТНЫЙ ВЫХОД\n91 SELL за 30 сек\nT1: MC=$67.79k→$3k"]]
+    EARLY_EXIT[["РАННИЙ ВЫХОД\nРежем убытки\nT2: MC=$34.54k"]]
+    WAIT["Ждём interval\n16-184с (p50=66с)"] --> TICK
+
+    style STANDARD_EXIT fill:#1a3a10,stroke:#00e57a
+    style EARLY_EXIT fill:#3a1a00,stroke:#ffc93c
+    style BUY_MODE fill:#0a2a18,stroke:#00e57a
+    style SELL_MODE fill:#2a0a10,stroke:#ff4f6a
+  </div>
+</div>
+
+<div class="card" style="font-size:12px;color:var(--muted)">
+  Данные: Helius RPC · T1 = 56MEDV…pump · T2 = 9btAALf…pump · SOL ≈ $92.27 · 100/131 совпадающих кошельков
+</div>
+
+</div><!-- /container -->
+<script>mermaid.initialize({startOnLoad:true,theme:'dark',themeVariables:{primaryColor:'#1a2236',primaryTextColor:'#e4eaf2',primaryBorderColor:'#1f2a3a',lineColor:'#6b7a8f',secondaryColor:'#0a1420',tertiaryColor:'#0d0f14'}});</script>
+<script>
+const MATH = {"t1_timeline": [{"min": 0, "mc": 9101.0, "org_net": -35.602, "team_pnl": -43.851, "mode": "BUY", "tb": 64.253, "ts": 20.402, "ob": 72.307, "os": 107.909, "cum_org_net": -35.602}, {"min": 1, "mc": 14820.0, "org_net": -9.153, "team_pnl": -54.193, "mode": "BUY", "tb": 36.69, "ts": 26.348, "ob": 39.853, "os": 49.006, "cum_org_net": -44.755}, {"min": 2, "mc": 20226.0, "org_net": -8.85, "team_pnl": -63.108, "mode": "NEUTRAL", "tb": 41.85, "ts": 32.934, "ob": 42.544, "os": 51.394, "cum_org_net": -53.605}, {"min": 3, "mc": 22973.0, "org_net": -1.813, "team_pnl": -64.216, "mode": "NEUTRAL", "tb": 16.167, "ts": 15.06, "ob": 25.023, "os": 26.836, "cum_org_net": -55.418}, {"min": 4, "mc": 24506.0, "org_net": -5.664, "team_pnl": -70.732, "mode": "BUY", "tb": 21.82, "ts": 15.304, "ob": 29.738, "os": 35.403, "cum_org_net": -61.082}, {"min": 5, "mc": 32375.0, "org_net": 1.369, "team_pnl": -69.622, "mode": "NEUTRAL", "tb": 12.625, "ts": 13.734, "ob": 28.398, "os": 27.029, "cum_org_net": -59.713}, {"min": 6, "mc": 31130.0, "org_net": 2.187, "team_pnl": -68.288, "mode": "NEUTRAL", "tb": 24.748, "ts": 26.082, "ob": 33.514, "os": 31.327, "cum_org_net": -57.526}, {"min": 7, "mc": 30962.0, "org_net": 1.118, "team_pnl": -68.311, "mode": "NEUTRAL", "tb": 31.089, "ts": 31.066, "ob": 39.533, "os": 38.415, "cum_org_net": -56.407}, {"min": 8, "mc": 34000.0, "org_net": 0.23, "team_pnl": -68.226, "mode": "NEUTRAL", "tb": 20.056, "ts": 20.141, "ob": 34.203, "os": 33.973, "cum_org_net": -56.177}, {"min": 9, "mc": 32884.0, "org_net": -2.293, "team_pnl": -71.249, "mode": "NEUTRAL", "tb": 26.706, "ts": 23.683, "ob": 33.208, "os": 35.501, "cum_org_net": -58.47}, {"min": 10, "mc": 36443.0, "org_net": 6.908, "team_pnl": -66.021, "mode": "NEUTRAL", "tb": 20.176, "ts": 25.404, "ob": 36.599, "os": 29.691, "cum_org_net": -51.562}, {"min": 11, "mc": 34816.0, "org_net": 8.25, "team_pnl": -59.486, "mode": "NEUTRAL", "tb": 27.974, "ts": 34.509, "ob": 42.107, "os": 33.857, "cum_org_net": -43.313}, {"min": 12, "mc": 31603.0, "org_net": -87.401, "team_pnl": -57.761, "mode": "NEUTRAL", "tb": 18.887, "ts": 20.612, "ob": 28.056, "os": 115.457, "cum_org_net": -130.714}, {"min": 13, "mc": 44034.0, "org_net": 13.37, "team_pnl": -56.599, "mode": "NEUTRAL", "tb": 19.922, "ts": 21.084, "ob": 22.97, "os": 9.6, "cum_org_net": -117.344}, {"min": 14, "mc": 50704.0, "org_net": 8.983, "team_pnl": -52.795, "mode": "NEUTRAL", "tb": 18.144, "ts": 21.948, "ob": 14.152, "os": 5.17, "cum_org_net": -108.361}, {"min": 15, "mc": 55315.0, "org_net": -0.261, "team_pnl": -45.178, "mode": "SELL", "tb": 12.035, "ts": 19.653, "ob": 7.459, "os": 7.72, "cum_org_net": -108.622}, {"min": 16, "mc": 53793.0, "org_net": -0.755, "team_pnl": -44.655, "mode": "NEUTRAL", "tb": 18.431, "ts": 18.955, "ob": 6.598, "os": 7.353, "cum_org_net": -109.378}, {"min": 17, "mc": 53588.0, "org_net": 5.73, "team_pnl": -42.707, "mode": "NEUTRAL", "tb": 18.723, "ts": 20.67, "ob": 8.581, "os": 2.851, "cum_org_net": -103.647}, {"min": 18, "mc": 59329.0, "org_net": 4.613, "team_pnl": -38.558, "mode": "SELL", "tb": 13.711, "ts": 17.86, "ob": 11.155, "os": 6.542, "cum_org_net": -99.034}, {"min": 19, "mc": 55552.0, "org_net": 0.034, "team_pnl": -34.835, "mode": "NEUTRAL", "tb": 17.597, "ts": 21.319, "ob": 8.82, "os": 8.786, "cum_org_net": -98.999}, {"min": 20, "mc": 55651.0, "org_net": 6.018, "team_pnl": -30.105, "mode": "SELL", "tb": 13.247, "ts": 17.977, "ob": 12.483, "os": 6.465, "cum_org_net": -92.981}, {"min": 21, "mc": 60583.0, "org_net": 0.186, "team_pnl": -29.258, "mode": "NEUTRAL", "tb": 14.785, "ts": 15.632, "ob": 6.54, "os": 6.354, "cum_org_net": -92.795}, {"min": 22, "mc": 68343.0, "org_net": 5.614, "team_pnl": -27.486, "mode": "NEUTRAL", "tb": 19.131, "ts": 20.903, "ob": 12.636, "os": 7.022, "cum_org_net": -87.181}, {"min": 23, "mc": 71175.0, "org_net": 3.936, "team_pnl": -14.064, "mode": "SELL", "tb": 14.571, "ts": 27.994, "ob": 13.778, "os": 9.842, "cum_org_net": -83.245}, {"min": 24, "mc": 62250.0, "org_net": 4.682, "team_pnl": -12.281, "mode": "NEUTRAL", "tb": 18.319, "ts": 20.101, "ob": 13.075, "os": 8.394, "cum_org_net": -78.563}, {"min": 25, "mc": 65246.0, "org_net": 2.294, "team_pnl": -5.51, "mode": "SELL", "tb": 14.105, "ts": 20.876, "ob": 11.886, "os": 9.592, "cum_org_net": -76.269}, {"min": 26, "mc": 15142.0, "org_net": -1.506, "team_pnl": 73.887, "mode": "SELL", "tb": 0.0, "ts": 79.397, "ob": 2.256, "os": 3.762, "cum_org_net": -77.775}, {"min": 27, "mc": 2418.0, "org_net": -1.448, "team_pnl": 73.887, "mode": "NEUTRAL", "tb": 0.0, "ts": 0.0, "ob": 0.07, "os": 1.518, "cum_org_net": -79.223}, {"min": 28, "mc": 2087.0, "org_net": 1.111, "team_pnl": 73.887, "mode": "NEUTRAL", "tb": 0.0, "ts": 0.0, "ob": 1.476, "os": 0.365, "cum_org_net": -78.112}, {"min": 29, "mc": 97.0, "org_net": 0.18, "team_pnl": 73.887, "mode": "NEUTRAL", "tb": 0.0, "ts": 0.0, "ob": 0.321, "os": 0.141, "cum_org_net": -77.932}, {"min": 30, "mc": 2709.0, "org_net": 2.643, "team_pnl": 73.887, "mode": "NEUTRAL", "tb": 0.0, "ts": 0.0, "ob": 3.296, "os": 0.653, "cum_org_net": -75.289}], "t2_timeline": [{"min": 0, "mc": 5265.0, "org_net": -38.895, "team_pnl": -46.712, "mode": "BUY", "tb": 46.712, "ts": 0.0, "ob": 134.23, "os": 173.126, "cum_org_net": -38.895}, {"min": 1, "mc": 16133.0, "org_net": -35.708, "team_pnl": -83.635, "mode": "BUY", "tb": 36.923, "ts": 0.0, "ob": 41.51, "os": 77.217, "cum_org_net": -74.603}, {"min": 2, "mc": 20594.0, "org_net": -24.608, "team_pnl": -109.045, "mode": "BUY", "tb": 25.41, "ts": 0.0, "ob": 27.957, "os": 52.565, "cum_org_net": -99.211}, {"min": 3, "mc": 20429.0, "org_net": -0.971, "team_pnl": -110.374, "mode": "NEUTRAL", "tb": 10.044, "ts": 8.715, "ob": 14.351, "os": 15.322, "cum_org_net": -100.182}, {"min": 4, "mc": 20380.0, "org_net": 0.244, "team_pnl": -111.905, "mode": "NEUTRAL", "tb": 14.077, "ts": 12.546, "ob": 16.434, "os": 16.19, "cum_org_net": -99.938}, {"min": 5, "mc": 19893.0, "org_net": 0.215, "team_pnl": -112.106, "mode": "NEUTRAL", "tb": 10.653, "ts": 10.451, "ob": 15.949, "os": 15.734, "cum_org_net": -99.723}, {"min": 6, "mc": 21888.0, "org_net": -1.46, "team_pnl": -113.968, "mode": "NEUTRAL", "tb": 13.47, "ts": 11.608, "ob": 14.155, "os": 15.615, "cum_org_net": -101.183}, {"min": 7, "mc": 24732.0, "org_net": -1.402, "team_pnl": -115.804, "mode": "NEUTRAL", "tb": 11.333, "ts": 9.497, "ob": 16.992, "os": 18.395, "cum_org_net": -102.585}, {"min": 8, "mc": 23190.0, "org_net": -3.327, "team_pnl": -119.17, "mode": "NEUTRAL", "tb": 14.736, "ts": 11.37, "ob": 16.143, "os": 19.471, "cum_org_net": -105.912}, {"min": 9, "mc": 24547.0, "org_net": -0.756, "team_pnl": -120.314, "mode": "NEUTRAL", "tb": 9.115, "ts": 7.971, "ob": 13.532, "os": 14.288, "cum_org_net": -106.669}, {"min": 10, "mc": 218678.0, "org_net": -0.047, "team_pnl": -120.553, "mode": "NEUTRAL", "tb": 11.68, "ts": 11.442, "ob": 18.73, "os": 18.777, "cum_org_net": -106.716}, {"min": 11, "mc": 27369.0, "org_net": -0.916, "team_pnl": -121.848, "mode": "NEUTRAL", "tb": 10.623, "ts": 9.328, "ob": 18.019, "os": 18.935, "cum_org_net": -107.632}, {"min": 12, "mc": 30418.0, "org_net": 8.229, "team_pnl": -114.272, "mode": "SELL", "tb": 13.305, "ts": 20.881, "ob": 28.505, "os": 20.276, "cum_org_net": -99.403}, {"min": 13, "mc": 24345.0, "org_net": -1.269, "team_pnl": -115.872, "mode": "NEUTRAL", "tb": 11.956, "ts": 10.355, "ob": 12.168, "os": 13.437, "cum_org_net": -100.672}, {"min": 14, "mc": 25742.0, "org_net": -2.11, "team_pnl": -118.32, "mode": "NEUTRAL", "tb": 11.071, "ts": 8.624, "ob": 9.703, "os": 11.813, "cum_org_net": -102.782}, {"min": 15, "mc": 28416.0, "org_net": -2.663, "team_pnl": -121.462, "mode": "BUY", "tb": 13.07, "ts": 9.928, "ob": 15.452, "os": 18.114, "cum_org_net": -105.444}, {"min": 16, "mc": 32366.0, "org_net": -1.001, "team_pnl": -122.942, "mode": "NEUTRAL", "tb": 10.651, "ts": 9.171, "ob": 16.351, "os": 17.352, "cum_org_net": -106.445}, {"min": 17, "mc": 34378.0, "org_net": -0.115, "team_pnl": -123.566, "mode": "NEUTRAL", "tb": 12.028, "ts": 11.404, "ob": 18.287, "os": 18.402, "cum_org_net": -106.56}, {"min": 18, "mc": 34574.0, "org_net": 2.236, "team_pnl": -121.812, "mode": "NEUTRAL", "tb": 11.786, "ts": 13.54, "ob": 19.155, "os": 16.919, "cum_org_net": -104.324}, {"min": 19, "mc": 31826.0, "org_net": -0.576, "team_pnl": -122.675, "mode": "NEUTRAL", "tb": 11.438, "ts": 10.575, "ob": 16.117, "os": 16.693, "cum_org_net": -104.9}, {"min": 20, "mc": 34082.0, "org_net": 3.619, "team_pnl": -119.489, "mode": "NEUTRAL", "tb": 12.712, "ts": 15.898, "ob": 18.719, "os": 15.1, "cum_org_net": -101.281}, {"min": 21, "mc": 33344.0, "org_net": -4.977, "team_pnl": -120.64, "mode": "NEUTRAL", "tb": 17.633, "ts": 16.482, "ob": 18.281, "os": 23.258, "cum_org_net": -106.258}, {"min": 22, "mc": 36257.0, "org_net": -2.128, "team_pnl": -123.153, "mode": "NEUTRAL", "tb": 13.595, "ts": 11.082, "ob": 13.628, "os": 15.757, "cum_org_net": -108.386}, {"min": 23, "mc": 34971.0, "org_net": 1.314, "team_pnl": -122.226, "mode": "NEUTRAL", "tb": 9.224, "ts": 10.151, "ob": 17.769, "os": 16.455, "cum_org_net": -107.072}, {"min": 24, "mc": 28953.0, "org_net": -2.751, "team_pnl": -125.299, "mode": "BUY", "tb": 12.147, "ts": 9.075, "ob": 10.456, "os": 13.207, "cum_org_net": -109.823}, {"min": 25, "mc": 32644.0, "org_net": -0.137, "team_pnl": -125.718, "mode": "NEUTRAL", "tb": 11.342, "ts": 10.923, "ob": 14.079, "os": 14.216, "cum_org_net": -109.96}, {"min": 26, "mc": 34281.0, "org_net": -1.439, "team_pnl": -127.473, "mode": "NEUTRAL", "tb": 9.683, "ts": 7.928, "ob": 10.238, "os": 11.677, "cum_org_net": -111.398}, {"min": 27, "mc": 34353.0, "org_net": -1.532, "team_pnl": -129.317, "mode": "NEUTRAL", "tb": 12.064, "ts": 10.221, "ob": 11.481, "os": 13.013, "cum_org_net": -112.93}, {"min": 28, "mc": 34873.0, "org_net": -0.547, "team_pnl": -130.689, "mode": "NEUTRAL", "tb": 11.226, "ts": 9.854, "ob": 12.31, "os": 12.856, "cum_org_net": -113.477}, {"min": 29, "mc": 36281.0, "org_net": -0.367, "team_pnl": -131.404, "mode": "NEUTRAL", "tb": 10.386, "ts": 9.671, "ob": 12.362, "os": 12.729, "cum_org_net": -113.844}, {"min": 30, "mc": 37149.0, "org_net": -1.587, "team_pnl": -133.399, "mode": "NEUTRAL", "tb": 10.676, "ts": 8.681, "ob": 12.828, "os": 14.414, "cum_org_net": -115.43}, {"min": 31, "mc": 37884.0, "org_net": 1.572, "team_pnl": -132.152, "mode": "NEUTRAL", "tb": 10.562, "ts": 11.809, "ob": 13.683, "os": 12.111, "cum_org_net": -113.858}, {"min": 32, "mc": 36450.0, "org_net": 0.145, "team_pnl": -132.258, "mode": "NEUTRAL", "tb": 6.888, "ts": 6.781, "ob": 10.692, "os": 10.547, "cum_org_net": -113.713}, {"min": 33, "mc": 36412.0, "org_net": -0.079, "team_pnl": -132.724, "mode": "NEUTRAL", "tb": 11.155, "ts": 10.69, "ob": 14.243, "os": 14.322, "cum_org_net": -113.792}, {"min": 34, "mc": 36985.0, "org_net": -3.159, "team_pnl": -136.015, "mode": "BUY", "tb": 4.648, "ts": 1.357, "ob": 2.778, "os": 5.937, "cum_org_net": -116.951}, {"min": 35, "mc": 37030.0, "org_net": 1.919, "team_pnl": -135.027, "mode": "NEUTRAL", "tb": 8.493, "ts": 9.481, "ob": 33.34, "os": 31.421, "cum_org_net": -115.032}, {"min": 36, "mc": 31241.0, "org_net": -2.654, "team_pnl": -138.047, "mode": "BUY", "tb": 11.88, "ts": 8.86, "ob": 11.248, "os": 13.902, "cum_org_net": -117.687}, {"min": 37, "mc": 31615.0, "org_net": 2.506, "team_pnl": -135.489, "mode": "SELL", "tb": 8.353, "ts": 10.911, "ob": 14.05, "os": 11.544, "cum_org_net": -115.18}, {"min": 38, "mc": 30254.0, "org_net": -1.519, "team_pnl": -137.281, "mode": "NEUTRAL", "tb": 11.263, "ts": 9.471, "ob": 9.9, "os": 11.419, "cum_org_net": -116.699}, {"min": 39, "mc": 30757.0, "org_net": -0.647, "team_pnl": -138.214, "mode": "NEUTRAL", "tb": 10.231, "ts": 9.297, "ob": 10.35, "os": 10.997, "cum_org_net": -117.346}, {"min": 40, "mc": 29640.0, "org_net": 0.527, "team_pnl": -138.004, "mode": "NEUTRAL", "tb": 9.951, "ts": 10.161, "ob": 11.894, "os": 11.368, "cum_org_net": -116.819}], "t1_summary": {"organic_buy_total": 642.63, "organic_sell_total": 717.93, "team_buy_total": 575.76, "team_sell_total": 649.65, "team_final_pnl_sol": 73.887, "migrate_mc_usd": 67790, "sell_mode_starts_min": 15, "sell_mode_starts_mc": 55315}, "t2_summary": {"organic_buy_total": 768.07, "organic_sell_total": 884.89, "team_buy_total": 534.19, "team_sell_total": 396.19, "team_final_pnl_sol": -138.004, "migrate_mc_usd": 34540, "sell_mode_starts_min": 37, "sell_mode_starts_mc": 31615}, "migration_cost_sol": 20, "sol_usd": 92.27, "key_rules": ["Первые 2-3 мин: только BUY — нет sell", "org_net > +2 SOL/мин → команда переходит в NET_SELL (дистрибуция)", "org_net < -2 SOL/мин → команда переходит в NET_BUY (поддержка цены)", "MC > 80% target → начинают NET_SELL без привязки к organic", "Дамп: MC ≥ target И organic_intensity ↓ → 60-90 одновременных SELL", "Migration cost = 20 SOL → нужен net_realized > 20 SOL до дампа"]};
+
+// Charts
+function makeDecisionChart(canvasId, timeline, mcColor, pnlColor, title) {
+  const filtered = timeline.filter(x=>x.min<=30);
+  const labels = filtered.map(x=>x.min+'m');
+  const rolling_org = [];
+  let cum=0;
+  for(const x of filtered){cum+=x.org_net; rolling_org.push(cum);}
+  new Chart(document.getElementById(canvasId).getContext('2d'),{
+    type:'bar',
+    data:{labels,datasets:[
+      {type:'line',label:'MC ($)',data:filtered.map(x=>x.mc),borderColor:mcColor,backgroundColor:'transparent',tension:0.3,pointRadius:0,borderWidth:2,yAxisID:'y2',order:0},
+      {type:'line',label:'Team P&L (SOL)',data:filtered.map(x=>x.team_pnl),borderColor:pnlColor,backgroundColor:'transparent',tension:0.2,pointRadius:2,borderWidth:1.5,yAxisID:'y3',order:1},
+      {label:'Org net/мин (SOL)',data:filtered.map(x=>x.org_net),backgroundColor:filtered.map(x=>x.org_net>=0?'rgba(0,229,122,.4)':'rgba(255,79,106,.4)'),yAxisID:'y',order:2},
+    ]},
+    options:{responsive:true,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{labels:{color:'#6b7a8f',font:{size:10}}}},
+      scales:{
+        x:{ticks:{color:'#6b7a8f',font:{size:9}},grid:{color:'#1a1f2a'}},
+        y:{ticks:{color:'#6b7a8f',font:{size:9}},grid:{color:'#1a1f2a'},title:{display:true,text:'Org net SOL/мин',color:'#6b7a8f'}},
+        y2:{position:'right',ticks:{color:mcColor,font:{size:9},callback:v=>'$'+v.toLocaleString()},grid:{display:false}},
+        y3:{position:'right',ticks:{color:pnlColor,font:{size:9},callback:v=>v.toFixed(0)+'S'},grid:{display:false},offset:true}
+      }}
+  });
+}
+makeDecisionChart('chartT1pnl', MATH.t1_timeline, '#00c4ff', '#ffc93c');
+makeDecisionChart('chartT2pnl', MATH.t2_timeline, '#00e57a', '#b66aff');
+
+// Decision tables
+function fillTable(tbodyId, timeline) {
+  const tbody = document.getElementById(tbodyId);
+  const modeClass={'BUY':'b-buy','SELL':'b-sell','NEUTRAL':'b-neutral'};
+  let prev_pnl=0;
+  for(const x of timeline) {
+    const pnlChange = x.team_pnl - prev_pnl;
+    prev_pnl = x.team_pnl;
+    const pnlCls = x.team_pnl>=0?'buy':'sell';
+    const orgCls = x.org_net>=0?'buy':'sell';
+    let logic='';
+    if(x.mode==='BUY'&&x.org_net<-2) logic='Органика сливает → поглощаем';
+    else if(x.mode==='SELL'&&x.org_net>2) logic='Органика покупает → продаём в неё';
+    else if(x.mode==='SELL'&&x.mc>50000) logic='MC>80% цели → дистрибуция';
+    else if(x.mode==='BUY') logic='Поддержка цены';
+    else logic='Маркет-мейкинг';
+    
+    tbody.innerHTML+=`<tr>
+      <td>${x.min}</td>
+      <td>$${x.mc.toLocaleString()}</td>
+      <td class="${orgCls}">${x.org_net>0?'+':''}${x.org_net.toFixed(2)}</td>
+      <td class="${pnlCls}">${x.team_pnl>0?'+':''}${x.team_pnl.toFixed(2)}S</td>
+      <td class="buy">${x.ob.toFixed(2)}</td>
+      <td class="sell">${x.os.toFixed(2)}</td>
+      <td class="buy">${x.tb.toFixed(2)}</td>
+      <td class="sell">${x.ts.toFixed(2)}</td>
+      <td><span class="badge ${modeClass[x.mode]||'b-neutral'}">${x.mode}</span></td>
+      <td style="color:var(--muted)">${logic}</td>
+    </tr>`;
+  }
+}
+fillTable('tableT1', MATH.t1_timeline);
+fillTable('tableT2', MATH.t2_timeline);
+</script>
+</body>
+</html>
