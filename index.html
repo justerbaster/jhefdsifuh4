@@ -2,349 +2,440 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>MM Algorithm — 56MEDV…pump</title>
+<title>MM Algorithm TZ — 2 токена</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 <style>
-:root{--bg:#0d0f14;--card:#161b25;--border:#1f2a3a;--accent:#00c4ff;--green:#00e57a;--red:#ff4f6a;--yellow:#ffc93c;--text:#e4eaf2;--muted:#6b7a8f}
+:root{--bg:#0d0f14;--card:#161b25;--border:#1f2a3a;--accent:#00c4ff;--green:#00e57a;--red:#ff4f6a;--yellow:#ffc93c;--purple:#b66aff;--text:#e4eaf2;--muted:#6b7a8f}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;font-size:14px;line-height:1.6}
+.container{max-width:1440px;margin:0 auto;padding:20px}
 h1{font-size:22px;font-weight:700;color:var(--accent)}
-h2{font-size:16px;font-weight:600;color:var(--accent);margin-bottom:10px;padding-left:10px;border-left:3px solid var(--accent)}
-h3{font-size:14px;font-weight:600;color:var(--yellow);margin-bottom:6px}
-.container{max-width:1400px;margin:0 auto;padding:20px}
-.header{text-align:center;padding:30px 0 20px;border-bottom:1px solid var(--border);margin-bottom:24px}
-.subtitle{color:var(--muted);font-size:13px;margin-top:4px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
-.stat-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
-.stat{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 18px;flex:1;min-width:140px}
-.stat-label{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.5px}
-.stat-val{font-size:22px;font-weight:700;color:var(--accent)}
+h2{font-size:15px;font-weight:600;color:var(--accent);margin-bottom:10px;padding-left:10px;border-left:3px solid var(--accent)}
+h3{font-size:13px;font-weight:600;color:var(--yellow);margin-bottom:6px}
+.header{text-align:center;padding:28px 0 18px;border-bottom:1px solid var(--border);margin-bottom:20px}
+.subtitle{color:var(--muted);font-size:12px;margin-top:4px}
+.tabs{display:flex;gap:0;margin-bottom:16px;border-bottom:2px solid var(--border)}
+.tab{padding:8px 20px;cursor:pointer;color:var(--muted);font-weight:500;font-size:13px;border-bottom:2px solid transparent;margin-bottom:-2px;transition:.2s}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-content{display:none}.tab-content.active{display:block}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px}
+.stat-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 16px;flex:1;min-width:120px}
+.stat-label{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.5px}
+.stat-val{font-size:20px;font-weight:700;color:var(--accent)}
 .stat-sub{font-size:11px;color:var(--muted)}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th{background:#1a2236;color:var(--muted);font-weight:500;padding:7px 10px;text-align:right;border-bottom:1px solid var(--border);font-size:11px;text-transform:uppercase}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:#1a2236;color:var(--muted);font-weight:500;padding:6px 8px;text-align:right;border-bottom:1px solid var(--border);font-size:10px;text-transform:uppercase}
 th:first-child{text-align:left}
-td{padding:6px 10px;border-bottom:1px solid #1a1f2a;text-align:right}
+td{padding:5px 8px;border-bottom:1px solid #1a1f2a;text-align:right}
 td:first-child{text-align:left;font-weight:500}
 tr:hover td{background:#1a2236}
 .buy{color:var(--green)} .sell{color:var(--red)} .net{color:var(--yellow)}
-.badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600}
-.b-sniper{background:#ff6b35;color:#fff}
-.b-mm{background:#00c4ff;color:#0d0f14}
-.b-passive{background:#4a5568;color:#fff}
-canvas{max-height:290px}
-.mermaid{font-size:13px}
-.algo-block{background:#0a1420;border:1px solid var(--border);border-radius:8px;padding:14px;margin:8px 0}
-.algo-title{font-weight:600;font-size:13px;margin-bottom:6px;display:flex;align-items:center;gap:8px}
-.dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex-shrink:0}
-.phase{display:grid;grid-template-columns:36px 1fr;gap:12px;margin-bottom:16px;align-items:start}
-.phase-num{background:var(--accent);color:#0d0f14;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px}
-.zone-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:12px 0}
-.zone-card{border-radius:8px;padding:10px;text-align:center;border:1px solid transparent}
-.za{background:#0d2040;border-color:#1a5296}.zb{background:#0a2a18;border-color:#1a6640}.zc{background:#2a2000;border-color:#665500}.zd{background:#2a0d10;border-color:#661a20}.ze{background:#2a0d2a;border-color:#661866}
-.zone-mc{font-size:11px;color:var(--muted);margin-bottom:4px}
-.zone-n{font-size:18px;font-weight:700}
-.zone-detail{font-size:11px;color:var(--muted);margin-top:4px}
-.highlight{background:#1a3a20;border-left:3px solid var(--green);padding:10px 14px;border-radius:0 6px 6px 0;margin:8px 0;font-size:13px}
-.warn{background:#3a2000;border-left:3px solid var(--yellow);padding:10px 14px;border-radius:0 6px 6px 0;margin:8px 0;font-size:13px}
-.danger{background:#3a0010;border-left:3px solid var(--red);padding:10px 14px;border-radius:0 6px 6px 0;margin:8px 0;font-size:13px}
-.mc-badge{display:inline-block;padding:1px 6px;border-radius:4px;font-size:12px;font-weight:600;background:#1a3060;color:#00c4ff;border:1px solid #00c4ff33}
+canvas{max-height:270px}
+.mermaid{font-size:12px}
+.tz-section{counter-reset:tz-item}
+.tz-item{display:grid;grid-template-columns:28px 1fr;gap:10px;margin-bottom:10px;counter-increment:tz-item}
+.tz-num{background:var(--accent);color:#0d0f14;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;margin-top:2px}
+.tz-body h3{color:var(--text);margin-bottom:3px}
+.tz-body p{color:var(--muted);font-size:12px}
+.param-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin:8px 0}
+.param{background:#0a1420;border:1px solid var(--border);border-radius:6px;padding:8px 12px}
+.param-name{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.param-val{font-size:16px;font-weight:700;color:var(--yellow)}
+.param-note{font-size:10px;color:var(--muted);margin-top:2px}
+.tag{display:inline-block;padding:1px 7px;border-radius:4px;font-size:11px;font-weight:600;margin-right:4px}
+.t1{background:#1a3a50;color:#00c4ff;border:1px solid #00c4ff44}
+.t2{background:#1a3a20;color:#00e57a;border:1px solid #00e57a44}
+.both{background:#2a2a00;color:#ffc93c;border:1px solid #ffc93c44}
+.highlight{background:#1a3a20;border-left:3px solid var(--green);padding:9px 12px;border-radius:0 6px 6px 0;margin:8px 0;font-size:12px}
+.warn{background:#3a2000;border-left:3px solid var(--yellow);padding:9px 12px;border-radius:0 6px 6px 0;margin:8px 0;font-size:12px}
+.danger{background:#3a0010;border-left:3px solid var(--red);padding:9px 12px;border-radius:0 6px 6px 0;margin:8px 0;font-size:12px}
+.comparison-bar{display:flex;gap:8px;align-items:center;margin:4px 0;font-size:12px}
+.bar-fill{height:12px;border-radius:2px;min-width:4px}
+.badge{display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:600}
+.b-sniper{background:#ff6b35;color:#fff}.b-mm{background:#00c4ff;color:#0d0f14}
+.zone-row{display:grid;grid-template-columns:120px 1fr 1fr;gap:10px;padding:6px 0;border-bottom:1px solid #1a1f2a;align-items:center;font-size:12px}
+.mc-tag{display:inline-block;padding:1px 6px;border-radius:4px;font-size:11px;font-weight:600;background:#1a3060;color:#00c4ff}
 </style>
 </head>
 <body>
 <div class="container">
 
 <div class="header">
-  <h1>MM Algorithm — Токен 56MEDV…pump</h1>
-  <div class="subtitle">Реконструкция алгоритма по on-chain данным · 131 командный кошелёк · ~26 минут активности · Market Cap в USD</div>
-</div>
-
-<div class="stat-row" id="stats-top"></div>
-
-<!-- TIMELINE -->
-<div class="card" style="margin-bottom:16px">
-  <h2>Хронология: Market Cap ($USD) + объём сделок команды и органики</h2>
-  <canvas id="chartTimeline"></canvas>
-  <div style="margin-top:8px;font-size:12px;color:var(--muted);display:flex;gap:20px;flex-wrap:wrap">
-    <span><span style="color:var(--accent)">─────</span> Market Cap ($)</span>
-    <span><span style="color:var(--green)">█</span> Team BUY ($)</span>
-    <span><span style="color:var(--red)">█</span> Team SELL ($)</span>
-    <span><span style="color:rgba(0,180,90,0.3)">█</span> Org BUY (×0.5)</span>
-    <span><span style="color:rgba(255,79,106,0.2)">█</span> Org SELL (×0.5)</span>
-    <span style="color:var(--muted)">Каждый столбец = 30 сек</span>
+  <h1>MM Algorithm — Анализ 2 токенов · Техническое Задание для программиста</h1>
+  <div class="subtitle">
+    <span class="t1">Token 1</span> 56MEDV…pump · MC $4k→$67.79k · 26 мин &nbsp;|&nbsp;
+    <span class="t2">Token 2</span> 9btAALf…pump · MC $8k→$34.54k · ~40 мин &nbsp;|&nbsp;
+    <span class="both">100/131 кошельков совпадают</span>
   </div>
 </div>
 
-<!-- PHASES + ZONES -->
-<div class="card" style="margin-bottom:16px">
-  <h2>Алгоритм работы MM — 4 фазы</h2>
-  <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px">
-    <div style="flex:1;min-width:220px">
-      <div class="phase">
-        <div class="phase-num">1</div>
-        <div>
-          <h3>SEED — ранняя засыпка</h3>
-          <p style="color:var(--muted);font-size:13px">MC: <span class="mc-badge">$500 – $4k</span></p>
-          <p style="color:var(--muted);font-size:13px;margin-top:4px"><b style="color:var(--text)">~30 снайпер-кошельков</b> покупают по $5–7 каждый, занимая позиции до начала роста. Итого вложено &lt;$300.</p>
-        </div>
-      </div>
-      <div class="phase">
-        <div class="phase-num">2</div>
-        <div>
-          <h3>PUMP — активный маркет-мейкинг</h3>
-          <p style="color:var(--muted);font-size:13px">MC: <span class="mc-badge">$10k – $55k</span></p>
-          <p style="color:var(--muted);font-size:13px;margin-top:4px"><b style="color:var(--text)">98 MM-ботов</b> непрерывно BUY/SELL циклами. BUY p50 = <b style="color:var(--green)">$34–49</b>, SELL p50 = <b style="color:var(--red)">$75–91</b>. Спред ×2.1 на каждый оборот.</p>
-        </div>
-      </div>
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="showTab('overview')">Обзор и сравнение</div>
+  <div class="tab" onclick="showTab('t1')">Token 1 — Chart</div>
+  <div class="tab" onclick="showTab('t2')">Token 2 — Chart</div>
+  <div class="tab" onclick="showTab('tz')">ТЗ для программиста</div>
+  <div class="tab" onclick="showTab('wallets')">Кошельки T2</div>
+</div>
+
+<!-- ===== OVERVIEW ===== -->
+<div id="tab-overview" class="tab-content active">
+  <div class="stat-row" id="stats-overview"></div>
+
+  <div class="grid2">
+    <div class="card">
+      <h2>Сравнение двух токенов</h2>
+      <table>
+        <tr><th>Параметр</th><th class="t1" style="text-align:right">Token 1</th><th class="t2" style="text-align:right">Token 2</th></tr>
+        <tr><td>Миграция MC</td><td class="buy">$67,790</td><td class="buy">$34,540</td></tr>
+        <tr><td>Длительность активной фазы</td><td>~26 мин</td><td>~40 мин</td></tr>
+        <tr><td>Командных событий</td><td>1 575</td><td>2 788</td></tr>
+        <tr><td>Командных кошельков активных</td><td>131</td><td>100</td></tr>
+        <tr><td>BUY p50 ($)</td><td class="buy">$40.6</td><td class="buy">$15.5</td></tr>
+        <tr><td>SELL p50 ($)</td><td class="sell">$73.7</td><td class="sell">$37.0</td></tr>
+        <tr><td>SELL/BUY спред</td><td class="net">×1.81</td><td class="net">×2.39</td></tr>
+        <tr><td>Интервал между сделками p50</td><td>71с</td><td>66с</td></tr>
+        <tr><td>Реакция на org BUY p50</td><td>29с</td><td>30с</td></tr>
+        <tr><td>Дамп: кошельков за 1 слот</td><td class="sell">91</td><td class="sell">70</td></tr>
+        <tr><td>Пересечение кошельков с T1</td><td>—</td><td class="buy">100/131</td></tr>
+      </table>
     </div>
-    <div style="flex:1;min-width:220px">
-      <div class="phase">
-        <div class="phase-num" style="background:var(--yellow);color:#0d0f14">3</div>
-        <div>
-          <h3>DISTRIBUTION — скрытая продажа</h3>
-          <p style="color:var(--muted);font-size:13px">MC: <span class="mc-badge">$40k – $67k</span></p>
-          <p style="color:var(--muted);font-size:13px;margin-top:4px">Крупный wallet продаёт → в том же слоте 3–5 других покупают дробными лотами. Цена не падает, крупный holder не виден в топе.</p>
-        </div>
-      </div>
-      <div class="phase">
-        <div class="phase-num" style="background:var(--red);color:#fff">4</div>
-        <div>
-          <h3>EXIT — координированный дамп</h3>
-          <p style="color:var(--muted);font-size:13px">MC: <span class="mc-badge" style="border-color:#ff4f6a33;color:#ff4f6a;background:#2a0010">$67k → $3k за 30 сек</span></p>
-          <p style="color:var(--muted);font-size:13px;margin-top:4px"><b style="color:var(--text)">91 SELL-транзакция одновременно</b>. Все 131 кошелёк активны в &lt;1 мин до миграции на pump_swap.</p>
-        </div>
+    <div class="card">
+      <h2>Размеры сделок масштабируются с MC</h2>
+      <canvas id="chartDealSizes"></canvas>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px">
+        BUY и SELL в $ масштабируются пропорционально MC токена. Алгоритм использует % от текущего MC, а не фиксированный $.
       </div>
     </div>
   </div>
 
-  <h3>Активность команды по зонам Market Cap</h3>
-  <div class="zone-grid" id="zoneGrid"></div>
+  <div class="grid2">
+    <div class="card">
+      <h2>Тайминг — одинаков на обоих токенах</h2>
+      <canvas id="chartTiming"></canvas>
+      <div class="highlight" style="margin-top:10px">
+        Интервалы между сделками и лаги реакции практически идентичны — это жёстко захардкоженные параметры бота
+      </div>
+    </div>
+    <div class="card">
+      <h2>Зоны накопления и продажи</h2>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Соотношение SELL/BUY по зонам MC (ниже 1 = накопление)</div>
+      <canvas id="chartZones"></canvas>
+    </div>
+  </div>
 </div>
 
-<!-- RULES + MECHANISM -->
-<div class="grid2" style="margin-bottom:16px">
+<!-- ===== TOKEN 1 CHART ===== -->
+<div id="tab-t1" class="tab-content">
   <div class="card">
-    <h2>Правила реакции на органику</h2>
-    <div class="highlight">
-      <b>Крупный org BUY (топ 12%)</b><br>
-      → команда <b>покупает через 14–29 сек</b> (p25–p50)<br>
-      Размер: <b>$32–57</b> · Цель: усилить импульс, поднять MC
+    <h2>Token 1 — Market Cap и активность (30с бины)</h2>
+    <canvas id="chartT1"></canvas>
+    <div style="margin-top:6px;font-size:11px;color:var(--muted);display:flex;gap:16px">
+      <span><span style="color:var(--accent)">─</span> MC ($)</span>
+      <span><span style="color:var(--green)">█</span> Team BUY</span>
+      <span><span style="color:var(--red)">█</span> Team SELL</span>
+      <span><span style="color:rgba(0,180,90,0.25)">█</span> Org BUY ×0.5</span>
     </div>
-    <div class="warn">
-      <b>Крупный org SELL (топ 12%)</b><br>
-      → команда <b>покупает через ~30 сек</b><br>
-      Размер: $41–65 · Цель: поглотить давление, удержать цену
+  </div>
+  <div class="card">
+    <h2>Зоны MC — Token 1</h2>
+    <div id="zonesT1"></div>
+  </div>
+</div>
+
+<!-- ===== TOKEN 2 CHART ===== -->
+<div id="tab-t2" class="tab-content">
+  <div class="card">
+    <h2>Token 2 — Market Cap и активность (30с бины)</h2>
+    <canvas id="chartT2"></canvas>
+    <div style="margin-top:6px;font-size:11px;color:var(--muted);display:flex;gap:16px">
+      <span><span style="color:var(--green)">─</span> MC ($)</span>
+      <span><span style="color:var(--green)">█</span> Team BUY</span>
+      <span><span style="color:var(--red)">█</span> Team SELL</span>
+      <span><span style="color:rgba(0,180,90,0.25)">█</span> Org BUY ×0.5</span>
     </div>
-    <div class="danger" style="margin-top:8px">
-      <b>Зона $20k–$40k — главная рабочая зона</b><br>
-      443 BUY vs 255 SELL — преимущественно накопление<br>
-      В зоне $40k–$55k баланс 1:1 → начало дистрибуции
-    </div>
-    <table style="margin-top:12px">
-      <tr><th>Зона MC</th><th>BUY n</th><th>SELL n</th><th>BUY p50</th><th>SELL p50</th><th>S/B</th></tr>
-      <tr><td>A: &lt;$20k</td><td class="buy">142</td><td class="sell">107</td><td>$49</td><td>$48</td><td>0.75</td></tr>
-      <tr><td>B: $20k–$40k</td><td class="buy">443</td><td class="sell">255</td><td>$34</td><td style="color:var(--red);font-weight:600">$75</td><td style="color:var(--green)">0.58</td></tr>
-      <tr><td>C: $40k–$55k</td><td class="buy">115</td><td class="sell">127</td><td>$49</td><td style="color:var(--red);font-weight:600">$91</td><td style="color:var(--yellow)">1.10</td></tr>
-      <tr><td>D: $55k–$70k</td><td class="buy">198</td><td class="sell">158</td><td>$40</td><td style="color:var(--red);font-weight:600">$75</td><td>0.80</td></tr>
-    </table>
+  </div>
+  <div class="card">
+    <h2>Зоны MC — Token 2</h2>
+    <div id="zonesT2"></div>
+  </div>
+</div>
+
+<!-- ===== TZ ===== -->
+<div id="tab-tz" class="tab-content">
+
+  <div class="card">
+    <h2>Подтверждённые параметры алгоритма (из 2 токенов)</h2>
+    <div class="param-grid" id="paramGrid"></div>
   </div>
 
   <div class="card">
-    <h2>Как не убивали график</h2>
-    <div class="algo-block">
-      <div class="algo-title"><span class="dot" style="background:var(--green)"></span>Мелкие BUY от разных кошельков</div>
-      p50 = $34–49 за сделку · Ни один кошелёк не виден крупным покупателем → выглядит как органика
-    </div>
-    <div class="algo-block">
-      <div class="algo-title"><span class="dot" style="background:var(--red)"></span>SELL в 2× больше BUY по токенам</div>
-      BUY p50 = 1.28M tok · SELL p50 = 2.61M tok в зоне $20k–$40k<br>
-      Но дробят на 3–5 wallet в одном слоте → holder не выделяется
-    </div>
-    <div class="algo-block">
-      <div class="algo-title"><span class="dot" style="background:var(--yellow)"></span>Задержка реакции 14–45 сек</div>
-      Не реагируют мгновенно → бот выглядит «органично»<br>Разброс рандомный (p25=14с, p75=45с)
-    </div>
-    <div class="highlight">
-      <b>Экономика спреда в зоне $20k–$40k:</b><br>
-      Покупают по $34, продают по $75 = <b>+$41 на каждый оборот (+121%)</b><br>
-      На сотнях циклов это сотни долларов чистого P&L
-    </div>
-  </div>
-</div>
-
-<!-- WALLET TABLE -->
-<div class="card" style="margin-bottom:16px">
-  <h2>Топ-25 кошельков по P&amp;L (USD)</h2>
-  <table>
-    <tr>
-      <th>Кошелёк</th><th>Роль</th>
-      <th>BUY, n</th><th>BUY, $</th><th>MC buy</th>
-      <th>SELL, n</th><th>SELL, $</th><th>MC sell</th>
-      <th>Net P&amp;L</th>
-    </tr>
-    <tbody id="walletTable"></tbody>
-  </table>
-</div>
-
-<!-- FLOWCHART -->
-<div class="card" style="margin-bottom:16px">
-  <h2>Блок-схема алгоритма</h2>
-  <div class="mermaid">
+    <h2>Блок-схема алгоритма (уточнённая)</h2>
+    <div class="mermaid">
 flowchart TD
-    S([Старт: токен создан<br/>MC ≈ $4k]) --> SEED
+    S([Старт: токен создан\nMC ≈ $3-5k]) --> SEED
 
-    SEED[/"SEED фаза<br/>~30 снайперов × $5–7<br/>Вход при MC $500–$4k"/]
-    SEED --> MAIN
+    SEED[/"SEED фаза\n~30 снайпер-кошельков\n× $5-7 каждый\nВход при MC $500–$5k\nTIMEOUT: первые 30с"/]
+    SEED --> WARMUP
 
-    MAIN[["MM LOOP<br/>98 активных кошельков"]]
-    MAIN --> READ
+    WARMUP["Прогрев: 0-2 мин\nТолько BUY, нет SELL\nВсе 100+ кошельков активируются"]
+    WARMUP --> LOOP
 
-    READ{{"Мониторинг org активности<br/>скользящее окно ~60 сек"}}
-    READ --> QLOW
-    READ --> QHIGH
-    READ --> QSELL
+    LOOP[["MM LOOP\n100 активных кошельков"]]
+    LOOP --> MONITOR
 
-    QLOW["Органика тихая<br/>нет крупных сделок"]
-    QLOW --> REBALANCE
+    MONITOR{{"Монитор органики\nОкно: 60 сек\nСчитаем org_vol, org_count"}}
+    MONITOR --> QUIET
+    MONITOR --> LARGE_BUY
+    MONITOR --> LARGE_SELL
 
-    QHIGH["Крупный org BUY<br/>top-12% по объёму"]
-    QHIGH --> WAIT1[Ждём 14–29 сек]
-    WAIT1 --> FOLLOW["BUY $32–57<br/>1–3 кошелька<br/>Усиливаем импульс"]
-    FOLLOW --> MAIN
+    QUIET["Тихая органика"]
+    QUIET --> MC_CHECK
 
-    QSELL["Крупный org SELL<br/>top-12% по объёму"]
-    QSELL --> WAIT2[Ждём ~30 сек]
-    WAIT2 --> ABSORB["BUY $41–65<br/>Поглощаем давление"]
-    ABSORB --> MAIN
+    LARGE_BUY["org BUY ≥ top-12%"]
+    LARGE_BUY --> DELAY_B["Рандом задержка\nUniform(1s, 45s)\np50=30s"]
+    DELAY_B --> FOLLOW["BUY $15-$40\n1-3 кошелька\nУсилить импульс"]
+    FOLLOW --> LOOP
 
-    REBALANCE{"MC > $40k?"}
-    REBALANCE -- Нет --> BUY["BUY $30–50<br/>мелкие лоты<br/>от разных wallet"]
-    REBALANCE -- Да --> SELL["SELL $70–90<br/>дробим 2–4 wallet<br/>в одном слоте"]
-    BUY --> MAIN
-    SELL --> CHECK
+    LARGE_SELL["org SELL ≥ top-12%"]
+    LARGE_SELL --> DELAY_S["Задержка\nUniform(1s, 45s)"]
+    DELAY_S --> ABSORB["BUY $15-$40\nПоглотить давление"]
+    ABSORB --> LOOP
 
-    CHECK{"MC ≥ $65k<br/>И органика слабеет?"}
-    CHECK -- Нет --> MAIN
-    CHECK -- Да --> EXIT
+    MC_CHECK{"MC > 60% от целевого?"}
+    MC_CHECK -- Нет --> DO_BUY["BUY\np50=$15-40\n1 кошелёк\nИнтервал: 66с median"]
+    MC_CHECK -- Да --> DO_SELL["SELL\np50=$37-74\n1-2 кошелька\nДробим в разные слоты"]
+    DO_BUY --> INTER_WAIT["Интервал:\nUniform(16s, 184s)\np50=66s"]
+    DO_SELL --> INTER_WAIT
+    INTER_WAIT --> LOOP
 
-    EXIT[["EXIT: 131 кошелёк синхронно<br/>91 SELL за 30 сек<br/>MC: $67k → $3k"]]
-    EXIT --> MIGRATE([Миграция на pump_swap])
+    MC_CHECK --> EXIT_CHECK{"MC ≥ целевой\nИ org активность падает?"}
+    EXIT_CHECK -- Нет --> LOOP
+    EXIT_CHECK -- Да --> EXIT
+
+    EXIT[["EXIT:\nВсе кошельки синхронно\n60-90 SELL за 1-2 слота\nMC: цель → -70% за 30-60 сек"]]
+    EXIT --> DONE([Миграция на pump_swap])
 
     style SEED fill:#1a3a50,stroke:#00c4ff
-    style MAIN fill:#0a2a18,stroke:#00e57a
+    style LOOP fill:#0a2a18,stroke:#00e57a
     style EXIT fill:#3a0010,stroke:#ff4f6a
-    style MIGRATE fill:#2a2000,stroke:#ffc93c
+    style DONE fill:#2a2000,stroke:#ffc93c
+    style WARMUP fill:#1a2040,stroke:#4a6aff
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>ТЗ по пунктам — настройка таймингов и параметров</h2>
+    <div class="tz-section" id="tzList"></div>
+  </div>
+
+  <div class="card">
+    <h2>Как масштабировать под любой целевой MC</h2>
+    <div class="highlight">
+      <b>Формула размера сделки:</b><br>
+      BUY_size = current_MC × 0.00060 (≈ 0.06% от текущего MC)<br>
+      SELL_size = current_MC × 0.00110 (≈ 0.11% от текущего MC)<br><br>
+      Проверка: при MC=$30k → BUY=$18, SELL=$33 ✓ (совпадает с T2 данными)
+    </div>
+    <div class="highlight" style="margin-top:8px">
+      <b>Целевой MC для выхода:</b><br>
+      T1: выход при MC ≈ $67k (pump.fun стандарт $69k)<br>
+      T2: выход при MC ≈ $34.5k (половина стандарта — кастомный параметр)<br>
+      <b>Параметр: EXIT_MC_TARGET — задаётся при запуске бота</b>
+    </div>
+    <div class="danger">
+      <b>Дамп-механизм:</b> при достижении EXIT_MC_TARGET активируется одновременно для всех кошельков. Задержки между кошельками — случайные 0-3 секунды. Все сделки в 1-2 последовательных слотах. MC падает на 60-80% за 30-60 секунд.
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== WALLETS T2 ===== -->
+<div id="tab-wallets" class="tab-content">
+  <div class="card">
+    <h2>Топ-25 кошельков по P&amp;L — Token 2</h2>
+    <table>
+      <tr><th>Кошелёк</th><th>BUY n</th><th>BUY $</th><th>MC buy</th><th>SELL n</th><th>SELL $</th><th>MC sell</th><th>Net P&L</th></tr>
+      <tbody id="walletTableT2"></tbody>
+    </table>
   </div>
 </div>
 
-<!-- SOL FLOW -->
-<div class="card" style="margin-bottom:16px">
-  <h2>Экономика MM: денежный поток</h2>
-  <div class="mermaid">
-flowchart LR
-    OB["Органические покупатели\n↑ давят MC вверх"]
-    OS["Органические продавцы\n↓ давят MC вниз"]
-    TB["Команда BUY\np50 = $34–49 · 1.28M tok"]
-    TS["Команда SELL\np50 = $75–91 · 2.61M tok"]
-    CURVE[["Bonding Curve\npump.fun\n$4k → $69k"]]
-    PROFIT[["PROFIT команды\n+$41 на цикл\n×сотни циклов"]]
-
-    OB -->|"Покупают → MC растёт"| CURVE
-    CURVE -->|"Команда следует"| TB
-    TB -->|"Получают 1.28M tok"| TS
-    TS -->|"Продают за $75–91"| CURVE
-    CURVE -->|"$ с продажи"| PROFIT
-    OS -->|"Продают → давление"| CURVE
-    CURVE -->|"Команда поглощает"| TB
-
-    style PROFIT fill:#1a3a10,stroke:#00e57a
-    style CURVE fill:#1a2040,stroke:#00c4ff
-  </div>
-</div>
-
-<div class="card" style="margin-bottom:16px;font-size:12px;color:var(--muted)">
-  Данные: Helius RPC · Mint: 56MEDV2H1M7DkaikaSg5vpibaSyWhgspCxgPwQJhpump · ~5000 транзакций · 131 командный кошелёк · SOL ≈ $92 на момент сессии (11 Apr 2026) · Все $ — приближённые значения на основе on-chain дельт
-</div>
-</div>
+</div><!-- /container -->
 
 <script>
 mermaid.initialize({startOnLoad:true,theme:'dark',themeVariables:{primaryColor:'#1a2236',primaryTextColor:'#e4eaf2',primaryBorderColor:'#1f2a3a',lineColor:'#6b7a8f',secondaryColor:'#0a1420',tertiaryColor:'#0d0f14'}});
-</script>
-<script>
-const DATA = {"timeline": [{"sec": 0, "mcap": 9313.0, "tb": 51, "ts": 7, "ob": 47, "os": 74, "tb_usd": 3901.0, "ts_usd": 469.0, "ob_usd": 4865.0, "os_usd": 7600.0}, {"sec": 30, "mcap": 13791.0, "tb": 24, "ts": 8, "ob": 39, "os": 55, "tb_usd": 2028.0, "ts_usd": 1413.0, "ob_usd": 1807.0, "os_usd": 2357.0}, {"sec": 60, "mcap": 15706.0, "tb": 23, "ts": 6, "ob": 28, "os": 45, "tb_usd": 1735.0, "ts_usd": 1195.0, "ob_usd": 1509.0, "os_usd": 1998.0}, {"sec": 90, "mcap": 18616.0, "tb": 23, "ts": 5, "ob": 35, "os": 53, "tb_usd": 1651.0, "ts_usd": 1236.0, "ob_usd": 2168.0, "os_usd": 2524.0}, {"sec": 120, "mcap": 19445.0, "tb": 28, "ts": 8, "ob": 33, "os": 53, "tb_usd": 2510.0, "ts_usd": 2455.0, "ob_usd": 2894.0, "os_usd": 2982.0}, {"sec": 150, "mcap": 21803.0, "tb": 23, "ts": 7, "ob": 33, "os": 49, "tb_usd": 1351.0, "ts_usd": 584.0, "ob_usd": 1032.0, "os_usd": 1760.0}, {"sec": 180, "mcap": 22636.0, "tb": 14, "ts": 12, "ob": 33, "os": 36, "tb_usd": 690.0, "ts_usd": 620.0, "ob_usd": 940.0, "os_usd": 1033.0}, {"sec": 210, "mcap": 23665.0, "tb": 16, "ts": 9, "ob": 35, "os": 42, "tb_usd": 801.0, "ts_usd": 769.0, "ob_usd": 1369.0, "os_usd": 1443.0}, {"sec": 240, "mcap": 24583.0, "tb": 21, "ts": 10, "ob": 25, "os": 36, "tb_usd": 1064.0, "ts_usd": 909.0, "ob_usd": 1340.0, "os_usd": 1461.0}, {"sec": 270, "mcap": 27797.0, "tb": 14, "ts": 8, "ob": 38, "os": 44, "tb_usd": 950.0, "ts_usd": 503.0, "ob_usd": 1404.0, "os_usd": 1806.0}, {"sec": 300, "mcap": 32073.0, "tb": 3, "ts": 11, "ob": 44, "os": 36, "tb_usd": 238.0, "ts_usd": 657.0, "ob_usd": 1624.0, "os_usd": 1170.0}, {"sec": 330, "mcap": 29772.0, "tb": 22, "ts": 8, "ob": 38, "os": 52, "tb_usd": 927.0, "ts_usd": 610.0, "ob_usd": 996.0, "os_usd": 1324.0}, {"sec": 360, "mcap": 31483.0, "tb": 26, "ts": 10, "ob": 37, "os": 54, "tb_usd": 1505.0, "ts_usd": 1439.0, "ob_usd": 1927.0, "os_usd": 1943.0}, {"sec": 390, "mcap": 31888.0, "tb": 13, "ts": 17, "ob": 34, "os": 30, "tb_usd": 778.0, "ts_usd": 968.0, "ob_usd": 1165.0, "os_usd": 948.0}, {"sec": 420, "mcap": 32052.0, "tb": 24, "ts": 16, "ob": 36, "os": 44, "tb_usd": 1565.0, "ts_usd": 1363.0, "ob_usd": 1777.0, "os_usd": 1929.0}, {"sec": 450, "mcap": 33484.0, "tb": 23, "ts": 16, "ob": 34, "os": 41, "tb_usd": 1304.0, "ts_usd": 1504.0, "ob_usd": 1870.0, "os_usd": 1616.0}, {"sec": 480, "mcap": 33938.0, "tb": 26, "ts": 10, "ob": 36, "os": 52, "tb_usd": 902.0, "ts_usd": 1105.0, "ob_usd": 1618.0, "os_usd": 1440.0}, {"sec": 510, "mcap": 33822.0, "tb": 20, "ts": 10, "ob": 36, "os": 46, "tb_usd": 949.0, "ts_usd": 753.0, "ob_usd": 1538.0, "os_usd": 1695.0}, {"sec": 540, "mcap": 32869.0, "tb": 25, "ts": 11, "ob": 31, "os": 45, "tb_usd": 1087.0, "ts_usd": 1032.0, "ob_usd": 1370.0, "os_usd": 1406.0}, {"sec": 570, "mcap": 34041.0, "tb": 26, "ts": 12, "ob": 38, "os": 52, "tb_usd": 1377.0, "ts_usd": 1153.0, "ob_usd": 1694.0, "os_usd": 1870.0}, {"sec": 600, "mcap": 35231.0, "tb": 21, "ts": 16, "ob": 42, "os": 47, "tb_usd": 1098.0, "ts_usd": 1565.0, "ob_usd": 2184.0, "os_usd": 1666.0}, {"sec": 630, "mcap": 33866.0, "tb": 23, "ts": 11, "ob": 26, "os": 37, "tb_usd": 764.0, "ts_usd": 779.0, "ob_usd": 1193.0, "os_usd": 1074.0}, {"sec": 660, "mcap": 34562.0, "tb": 24, "ts": 11, "ob": 29, "os": 42, "tb_usd": 1362.0, "ts_usd": 1497.0, "ob_usd": 1744.0, "os_usd": 1504.0}, {"sec": 690, "mcap": 34009.0, "tb": 25, "ts": 10, "ob": 30, "os": 45, "tb_usd": 1220.0, "ts_usd": 1687.0, "ob_usd": 2141.0, "os_usd": 1620.0}, {"sec": 720, "mcap": 33607.0, "tb": 27, "ts": 12, "ob": 29, "os": 44, "tb_usd": 1021.0, "ts_usd": 737.0, "ob_usd": 1100.0, "os_usd": 1386.0}, {"sec": 750, "mcap": 39829.0, "tb": 11, "ts": 11, "ob": 71, "os": 35, "tb_usd": 722.0, "ts_usd": 1165.0, "ob_usd": 1489.0, "os_usd": 9268.0}, {"sec": 780, "mcap": 36519.0, "tb": 13, "ts": 11, "ob": 47, "os": 8, "tb_usd": 636.0, "ts_usd": 1073.0, "ob_usd": 712.0, "os_usd": 250.0}, {"sec": 810, "mcap": 46038.0, "tb": 15, "ts": 11, "ob": 41, "os": 25, "tb_usd": 1203.0, "ts_usd": 872.0, "ob_usd": 1408.0, "os_usd": 636.0}, {"sec": 840, "mcap": 45414.0, "tb": 16, "ts": 15, "ob": 30, "os": 9, "tb_usd": 852.0, "ts_usd": 1535.0, "ob_usd": 533.0, "os_usd": 87.0}, {"sec": 870, "mcap": 51006.0, "tb": 12, "ts": 9, "ob": 25, "os": 19, "tb_usd": 822.0, "ts_usd": 491.0, "ob_usd": 773.0, "os_usd": 390.0}, {"sec": 900, "mcap": 54078.0, "tb": 12, "ts": 12, "ob": 28, "os": 17, "tb_usd": 660.0, "ts_usd": 763.0, "ob_usd": 373.0, "os_usd": 422.0}, {"sec": 930, "mcap": 54408.0, "tb": 14, "ts": 13, "ob": 17, "os": 9, "tb_usd": 451.0, "ts_usd": 1050.0, "ob_usd": 315.0, "os_usd": 290.0}, {"sec": 960, "mcap": 52546.0, "tb": 14, "ts": 10, "ob": 20, "os": 10, "tb_usd": 891.0, "ts_usd": 910.0, "ob_usd": 200.0, "os_usd": 468.0}, {"sec": 990, "mcap": 52642.0, "tb": 8, "ts": 13, "ob": 15, "os": 18, "tb_usd": 809.0, "ts_usd": 839.0, "ob_usd": 409.0, "os_usd": 210.0}, {"sec": 1020, "mcap": 54321.0, "tb": 9, "ts": 13, "ob": 18, "os": 4, "tb_usd": 657.0, "ts_usd": 1201.0, "ob_usd": 384.0, "os_usd": 6.0}, {"sec": 1050, "mcap": 56698.0, "tb": 17, "ts": 8, "ob": 14, "os": 10, "tb_usd": 1070.0, "ts_usd": 707.0, "ob_usd": 408.0, "os_usd": 257.0}, {"sec": 1080, "mcap": 54255.0, "tb": 11, "ts": 10, "ob": 25, "os": 10, "tb_usd": 567.0, "ts_usd": 907.0, "ob_usd": 337.0, "os_usd": 512.0}, {"sec": 1110, "mcap": 51645.0, "tb": 14, "ts": 7, "ob": 15, "os": 8, "tb_usd": 698.0, "ts_usd": 741.0, "ob_usd": 693.0, "os_usd": 91.0}, {"sec": 1140, "mcap": 61025.0, "tb": 18, "ts": 10, "ob": 27, "os": 19, "tb_usd": 867.0, "ts_usd": 742.0, "ob_usd": 715.0, "os_usd": 692.0}, {"sec": 1170, "mcap": 55999.0, "tb": 12, "ts": 12, "ob": 12, "os": 9, "tb_usd": 757.0, "ts_usd": 1225.0, "ob_usd": 99.0, "os_usd": 119.0}, {"sec": 1200, "mcap": 59874.0, "tb": 12, "ts": 7, "ob": 15, "os": 8, "tb_usd": 653.0, "ts_usd": 690.0, "ob_usd": 575.0, "os_usd": 91.0}, {"sec": 1230, "mcap": 61222.0, "tb": 12, "ts": 14, "ob": 29, "os": 12, "tb_usd": 569.0, "ts_usd": 969.0, "ob_usd": 577.0, "os_usd": 506.0}, {"sec": 1260, "mcap": 60940.0, "tb": 14, "ts": 8, "ob": 19, "os": 5, "tb_usd": 693.0, "ts_usd": 904.0, "ob_usd": 273.0, "os_usd": 97.0}, {"sec": 1290, "mcap": 64766.0, "tb": 19, "ts": 7, "ob": 19, "os": 15, "tb_usd": 671.0, "ts_usd": 538.0, "ob_usd": 330.0, "os_usd": 490.0}, {"sec": 1320, "mcap": 67593.0, "tb": 12, "ts": 12, "ob": 21, "os": 17, "tb_usd": 803.0, "ts_usd": 1138.0, "ob_usd": 530.0, "os_usd": 151.0}, {"sec": 1350, "mcap": 70317.0, "tb": 19, "ts": 7, "ob": 19, "os": 18, "tb_usd": 963.0, "ts_usd": 791.0, "ob_usd": 636.0, "os_usd": 497.0}, {"sec": 1380, "mcap": 70291.0, "tb": 10, "ts": 15, "ob": 17, "os": 9, "tb_usd": 731.0, "ts_usd": 1269.0, "ob_usd": 405.0, "os_usd": 238.0}, {"sec": 1410, "mcap": 63327.0, "tb": 10, "ts": 13, "ob": 34, "os": 16, "tb_usd": 614.0, "ts_usd": 1314.0, "ob_usd": 867.0, "os_usd": 671.0}, {"sec": 1440, "mcap": 65639.0, "tb": 19, "ts": 10, "ob": 23, "os": 12, "tb_usd": 1223.0, "ts_usd": 725.0, "ob_usd": 576.0, "os_usd": 453.0}, {"sec": 1470, "mcap": 66892.0, "tb": 13, "ts": 13, "ob": 26, "os": 10, "tb_usd": 467.0, "ts_usd": 1130.0, "ob_usd": 630.0, "os_usd": 321.0}, {"sec": 1500, "mcap": 64010.0, "tb": 14, "ts": 15, "ob": 19, "os": 6, "tb_usd": 950.0, "ts_usd": 1266.0, "ob_usd": 638.0, "os_usd": 353.0}, {"sec": 1530, "mcap": 61144.0, "tb": 10, "ts": 12, "ob": 22, "os": 10, "tb_usd": 351.0, "ts_usd": 660.0, "ob_usd": 458.0, "os_usd": 532.0}, {"sec": 1560, "mcap": 3085.0, "tb": 0, "ts": 91, "ob": 12, "os": 115, "tb_usd": 0, "ts_usd": 7326.0, "ob_usd": 85.0, "os_usd": 222.0}, {"sec": 1590, "mcap": 2607.0, "tb": 0, "ts": 0, "ob": 4, "os": 48, "tb_usd": 0, "ts_usd": 0, "ob_usd": 123.0, "os_usd": 125.0}, {"sec": 1620, "mcap": 2511.0, "tb": 0, "ts": 0, "ob": 4, "os": 24, "tb_usd": 0, "ts_usd": 0, "ob_usd": 6.0, "os_usd": 129.0}, {"sec": 1650, "mcap": 2462.0, "tb": 0, "ts": 0, "ob": 0, "os": 9, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 11.0}, {"sec": 1680, "mcap": 2563.0, "tb": 0, "ts": 0, "ob": 5, "os": 10, "tb_usd": 0, "ts_usd": 0, "ob_usd": 54.0, "os_usd": 17.0}, {"sec": 1710, "mcap": 2496.0, "tb": 0, "ts": 0, "ob": 5, "os": 10, "tb_usd": 0, "ts_usd": 0, "ob_usd": 82.0, "os_usd": 16.0}, {"sec": 1740, "mcap": 1671.0, "tb": 0, "ts": 0, "ob": 0, "os": 3, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 1770, "mcap": 2748.0, "tb": 0, "ts": 0, "ob": 1, "os": 8, "tb_usd": 0, "ts_usd": 0, "ob_usd": 30.0, "os_usd": 12.0}, {"sec": 1800, "mcap": 3134.0, "tb": 0, "ts": 0, "ob": 12, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 155.0, "os_usd": 4.0}, {"sec": 1830, "mcap": 3479.0, "tb": 0, "ts": 0, "ob": 11, "os": 3, "tb_usd": 0, "ts_usd": 0, "ob_usd": 149.0, "os_usd": 56.0}, {"sec": 1860, "mcap": 3916.0, "tb": 0, "ts": 0, "ob": 6, "os": 5, "tb_usd": 0, "ts_usd": 0, "ob_usd": 59.0, "os_usd": 11.0}, {"sec": 1890, "mcap": 3788.0, "tb": 0, "ts": 0, "ob": 3, "os": 6, "tb_usd": 0, "ts_usd": 0, "ob_usd": 17.0, "os_usd": 67.0}, {"sec": 1920, "mcap": 3602.0, "tb": 0, "ts": 0, "ob": 0, "os": 5, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 33.0}, {"sec": 1950, "mcap": 3600.0, "tb": 0, "ts": 0, "ob": 1, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 8.0, "os_usd": 15.0}, {"sec": 1980, "mcap": 2888.0, "tb": 0, "ts": 0, "ob": 1, "os": 3, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 6.0}, {"sec": 2010, "mcap": 3745.0, "tb": 0, "ts": 0, "ob": 3, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 134.0, "os_usd": 5.0}, {"sec": 2040, "mcap": 4220.0, "tb": 0, "ts": 0, "ob": 7, "os": 3, "tb_usd": 0, "ts_usd": 0, "ob_usd": 112.0, "os_usd": 1.0}, {"sec": 2070, "mcap": 5027.0, "tb": 0, "ts": 0, "ob": 4, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 249.0, "os_usd": 7.0}, {"sec": 2100, "mcap": 5130.0, "tb": 0, "ts": 0, "ob": 4, "os": 3, "tb_usd": 0, "ts_usd": 0, "ob_usd": 46.0, "os_usd": 84.0}, {"sec": 2130, "mcap": 5161.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 2.0, "os_usd": 0}, {"sec": 2160, "mcap": 4712.0, "tb": 0, "ts": 0, "ob": 3, "os": 4, "tb_usd": 0, "ts_usd": 0, "ob_usd": 34.0, "os_usd": 62.0}, {"sec": 2190, "mcap": 4572.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 13.0}, {"sec": 2220, "mcap": 4318.0, "tb": 0, "ts": 0, "ob": 2, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 1.0, "os_usd": 4.0}, {"sec": 2250, "mcap": 4639.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 12.0}, {"sec": 2280, "mcap": 4823.0, "tb": 0, "ts": 0, "ob": 2, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 15.0, "os_usd": 2.0}, {"sec": 2310, "mcap": 4889.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 1.0, "os_usd": 0}, {"sec": 2340, "mcap": 4862.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 1.0, "os_usd": 4.0}, {"sec": 2370, "mcap": 4545.0, "tb": 0, "ts": 0, "ob": 0, "os": 3, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 54.0}, {"sec": 2400, "mcap": 4830.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 9.0, "os_usd": 0.0}, {"sec": 2430, "mcap": 5679.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 2.0, "os_usd": 4.0}, {"sec": 2460, "mcap": 4403.0, "tb": 0, "ts": 0, "ob": 0, "os": 4, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 9.0}, {"sec": 2490, "mcap": 4612.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 4.0, "os_usd": 1.0}, {"sec": 2520, "mcap": 4261.0, "tb": 0, "ts": 0, "ob": 0, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 115.0}, {"sec": 2550, "mcap": 4032.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 8.0}, {"sec": 2610, "mcap": 3964.0, "tb": 0, "ts": 0, "ob": 1, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 47.0}, {"sec": 2640, "mcap": 3843.0, "tb": 0, "ts": 0, "ob": 0, "os": 4, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 13.0}, {"sec": 2670, "mcap": 3489.0, "tb": 0, "ts": 0, "ob": 1, "os": 4, "tb_usd": 0, "ts_usd": 0, "ob_usd": 1.0, "os_usd": 140.0}, {"sec": 2700, "mcap": 3615.0, "tb": 0, "ts": 0, "ob": 2, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 8.0, "os_usd": 1.0}, {"sec": 2730, "mcap": 3662.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0}, {"sec": 2760, "mcap": 4.0, "tb": 0, "ts": 0, "ob": 1, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 1.0}, {"sec": 2820, "mcap": 3773.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0}, {"sec": 2880, "mcap": 7992.0, "tb": 0, "ts": 0, "ob": 0, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 21.0}, {"sec": 2910, "mcap": 63965.0, "tb": 0, "ts": 0, "ob": 0, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 86.0}, {"sec": 2940, "mcap": 3419.0, "tb": 0, "ts": 0, "ob": 2, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 34.0, "os_usd": 0}, {"sec": 2970, "mcap": 44857.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 2.0, "os_usd": 0.0}, {"sec": 3000, "mcap": 3449.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 5.0, "os_usd": 10.0}, {"sec": 3030, "mcap": 3170.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 9.0}, {"sec": 3120, "mcap": 3245.0, "tb": 0, "ts": 0, "ob": 2, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 1.0, "os_usd": 37.0}, {"sec": 3150, "mcap": 3186.0, "tb": 0, "ts": 0, "ob": 0, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 16.0}, {"sec": 3210, "mcap": 3300.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 1.0, "os_usd": 32.0}, {"sec": 3240, "mcap": 3016.0, "tb": 0, "ts": 0, "ob": 0, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 30.0}, {"sec": 3270, "mcap": 2835.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 96.0}, {"sec": 3330, "mcap": 2693.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 13.0}, {"sec": 3420, "mcap": 1712.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 3450, "mcap": 2666.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0.0}, {"sec": 3510, "mcap": 2215.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 3540, "mcap": 0.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0}, {"sec": 3570, "mcap": 0.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0}, {"sec": 3630, "mcap": 3260.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 13.0, "os_usd": 0}, {"sec": 3660, "mcap": 3506.0, "tb": 0, "ts": 0, "ob": 2, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 86.0, "os_usd": 0}, {"sec": 3690, "mcap": 2.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0}, {"sec": 3720, "mcap": 3535.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 6.0, "os_usd": 0}, {"sec": 3750, "mcap": 3605.0, "tb": 0, "ts": 0, "ob": 5, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 85.0, "os_usd": 1.0}, {"sec": 3780, "mcap": 3449.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 72.0}, {"sec": 3810, "mcap": 186.0, "tb": 0, "ts": 0, "ob": 2, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0}, {"sec": 3900, "mcap": 3523.0, "tb": 0, "ts": 0, "ob": 3, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 15.0, "os_usd": 0}, {"sec": 3930, "mcap": 3563.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 5.0, "os_usd": 0.0}, {"sec": 3960, "mcap": 4762.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0}, {"sec": 3990, "mcap": 1828.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 4020, "mcap": 3504.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 6.0}, {"sec": 4170, "mcap": 3471.0, "tb": 0, "ts": 0, "ob": 0, "os": 3, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 3.0}, {"sec": 4260, "mcap": 3531.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 43.0, "os_usd": 0.0}, {"sec": 4290, "mcap": 2984.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 4.0}, {"sec": 4350, "mcap": 3439.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 3.0}, {"sec": 4380, "mcap": 3818.0, "tb": 0, "ts": 0, "ob": 2, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 14.0, "os_usd": 0}, {"sec": 4440, "mcap": 3429.0, "tb": 0, "ts": 0, "ob": 0, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 9.0}, {"sec": 4470, "mcap": 3650.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 24.0, "os_usd": 0}, {"sec": 4500, "mcap": 218.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 4590, "mcap": 3436.0, "tb": 0, "ts": 0, "ob": 1, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 7.0, "os_usd": 9.0}, {"sec": 4770, "mcap": 4062.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 8.0, "os_usd": 13.0}, {"sec": 4800, "mcap": 4029.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 6.0, "os_usd": 0}, {"sec": 4950, "mcap": 3747.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 5040, "mcap": 3763.0, "tb": 0, "ts": 0, "ob": 0, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 11.0}, {"sec": 5070, "mcap": 26.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0}, {"sec": 5100, "mcap": 45.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0}, {"sec": 5160, "mcap": 3405.0, "tb": 0, "ts": 0, "ob": 0, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 3.0}, {"sec": 5190, "mcap": 20.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0}, {"sec": 5250, "mcap": 3945.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 2.0, "os_usd": 0}, {"sec": 5310, "mcap": 3445.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 2.0}, {"sec": 5340, "mcap": 3413.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 9.0}, {"sec": 5370, "mcap": 105.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 5460, "mcap": 9.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 5490, "mcap": 3312.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 5580, "mcap": 3289.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 5.0}, {"sec": 5610, "mcap": 3285.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 2.0}, {"sec": 5700, "mcap": 3345.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 4.0}, {"sec": 5730, "mcap": 3499.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 15.0, "os_usd": 0}, {"sec": 5850, "mcap": 17923.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 42.0, "os_usd": 43.0}, {"sec": 5910, "mcap": 1.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 6000, "mcap": 0.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 6030, "mcap": 2928.0, "tb": 0, "ts": 0, "ob": 0, "os": 3, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 14.0}, {"sec": 6090, "mcap": 8.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 6150, "mcap": 2888.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 8.0}, {"sec": 6180, "mcap": 2918.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 3.0}, {"sec": 6360, "mcap": 2873.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 44.0}, {"sec": 6780, "mcap": 1660.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 6870, "mcap": 2725.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 6960, "mcap": 2714.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 9.0}, {"sec": 7350, "mcap": 2707.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 3.0}, {"sec": 7380, "mcap": 2763.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 2.0}, {"sec": 7620, "mcap": 2.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 7740, "mcap": 1254.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 7770, "mcap": 2408.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 2.0}, {"sec": 7830, "mcap": 4.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 7860, "mcap": 2660.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 8220, "mcap": 0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 2.0}, {"sec": 8430, "mcap": 2557.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 8550, "mcap": 2793.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 8670, "mcap": 2355.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 6.0}, {"sec": 8910, "mcap": 2907.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 2.0, "os_usd": 0}, {"sec": 9120, "mcap": 2753.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 9780, "mcap": 18.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 10290, "mcap": 2587.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 11070, "mcap": 65.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 11190, "mcap": 0.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 11820, "mcap": 14.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 12150, "mcap": 2517.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 5.0}, {"sec": 12240, "mcap": 0.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 12480, "mcap": 2306.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 6.0}, {"sec": 12510, "mcap": 7778.0, "tb": 0, "ts": 0, "ob": 3, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 30.0, "os_usd": 0}, {"sec": 12630, "mcap": 2451.0, "tb": 0, "ts": 0, "ob": 0, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 13380, "mcap": 2214.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0}, {"sec": 13440, "mcap": 248.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0}, {"sec": 13470, "mcap": 66.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0}, {"sec": 13500, "mcap": 235.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0}, {"sec": 14430, "mcap": 3036.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 1.0, "os_usd": 0}, {"sec": 14550, "mcap": 12285.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 14610, "mcap": 0.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0}, {"sec": 14640, "mcap": 2866.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 3.0, "os_usd": 0}, {"sec": 14700, "mcap": 3451.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 2.0, "os_usd": 0}, {"sec": 14850, "mcap": 2786.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 9.0, "os_usd": 0}, {"sec": 15420, "mcap": 2240.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 15540, "mcap": 2549.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 5.0}, {"sec": 16770, "mcap": 2464.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 14.0}, {"sec": 16890, "mcap": 2324.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 16980, "mcap": 2443.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 10.0}, {"sec": 18210, "mcap": 2459.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 2.0}, {"sec": 18630, "mcap": 2030.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 19200, "mcap": 1.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 19230, "mcap": 0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 22110, "mcap": 2347.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 3.0}, {"sec": 23820, "mcap": 2427.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 3.0}, {"sec": 24750, "mcap": 2013.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 27660, "mcap": 2257.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 27960, "mcap": 2418.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 28080, "mcap": 2352.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 77.0}, {"sec": 28260, "mcap": 2243.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 29730, "mcap": 2239.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 3.0}, {"sec": 30810, "mcap": 50.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 31890, "mcap": 2202.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 33000, "mcap": 2690.0, "tb": 0, "ts": 0, "ob": 2, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 2.0, "os_usd": 0}, {"sec": 33630, "mcap": 2356.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 2.0}, {"sec": 35040, "mcap": 2353.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 3.0}, {"sec": 38670, "mcap": 3.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 45600, "mcap": 1405.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 45990, "mcap": 2546.0, "tb": 0, "ts": 0, "ob": 4, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 71.0, "os_usd": 0}, {"sec": 46860, "mcap": 2535.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 49560, "mcap": 2468.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 49590, "mcap": 2.0, "tb": 0, "ts": 0, "ob": 0, "os": 3, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 66.0}, {"sec": 50280, "mcap": 2233.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 52260, "mcap": 2287.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 52350, "mcap": 27.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 52410, "mcap": 2240.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 53130, "mcap": 131.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 55110, "mcap": 2131.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 57750, "mcap": 2252.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 60810, "mcap": 10.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 63150, "mcap": 2189.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 30.0}, {"sec": 65250, "mcap": 2136.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 69330, "mcap": 15248.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 71430, "mcap": 2085.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 7.0}, {"sec": 74400, "mcap": 1838.0, "tb": 0, "ts": 0, "ob": 0, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 78330, "mcap": 3849.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 80100, "mcap": 13095.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 85500, "mcap": 1902.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 4.0}, {"sec": 91890, "mcap": 1959.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 96600, "mcap": 14.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 97560, "mcap": 630.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 99450, "mcap": 1945.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 102150, "mcap": 1895.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 112980, "mcap": 1935.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 119580, "mcap": 0.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 121920, "mcap": 1503.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 126150, "mcap": 0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 138000, "mcap": 1788.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 27.0}, {"sec": 144240, "mcap": 1675.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 148620, "mcap": 0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 2.0}, {"sec": 152100, "mcap": 14072.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 152130, "mcap": 1768.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 153360, "mcap": 1464.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 157140, "mcap": 1350.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 3.0}, {"sec": 157560, "mcap": 1741.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 4.0}, {"sec": 160650, "mcap": 272.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 161250, "mcap": 1708.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 168810, "mcap": 1615.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 172830, "mcap": 0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 190170, "mcap": 0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 222240, "mcap": 2.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 232200, "mcap": 1728.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 2.0}, {"sec": 243660, "mcap": 1711.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 244950, "mcap": 1705.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 260640, "mcap": 1723.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 2.0}, {"sec": 270240, "mcap": 1668.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 13.0}], "zones": {"A": {"nb": 142, "ns": 107, "b_usd_p50": 49, "s_usd_p50": 48, "b_tok_p50": 6226680, "s_tok_p50": 7529204, "b_usd_total": 11070, "s_usd_total": 10077, "label": "A: <$20k"}, "B": {"nb": 443, "ns": 255, "b_usd_p50": 34, "s_usd_p50": 75, "b_tok_p50": 1146299, "s_tok_p50": 2544867, "b_usd_total": 23056, "s_usd_total": 23792, "label": "B: $20k–$40k"}, "C": {"nb": 115, "ns": 127, "b_usd_p50": 49, "s_usd_p50": 91, "b_tok_p50": 947722, "s_tok_p50": 1873078, "b_usd_total": 6895, "s_usd_total": 12614, "label": "C: $40k–$55k"}, "D": {"nb": 198, "ns": 158, "b_usd_p50": 40, "s_usd_p50": 75, "b_tok_p50": 625830, "s_tok_p50": 1215779, "b_usd_total": 10581, "s_usd_total": 13242, "label": "D: $55k–$70k"}, "E": {"nb": 27, "ns": 3, "b_usd_p50": 42, "s_usd_p50": 50, "b_tok_p50": 594767, "s_tok_p50": 701108, "b_usd_total": 1525, "s_usd_total": 220, "label": "E: >$70k"}}, "wallets": [{"w": "Wallet_85", "b": 8, "s": 7, "b_usd": 320.3, "s_usd": 766.4, "net": 446.1, "b_mc": 35000.0, "s_mc": 58600.0, "role": "mm"}, {"w": "Wallet_7", "b": 10, "s": 6, "b_usd": 813.9, "s_usd": 1216.3, "net": 402.4, "b_mc": 33000.0, "s_mc": 46400.0, "role": "mm"}, {"w": "Wallet_117", "b": 1, "s": 1, "b_usd": 5.9, "s_usd": 387.1, "net": 381.2, "b_mc": 300.0, "s_mc": 19000.0, "role": "sniper"}, {"w": "Wallet_113", "b": 1, "s": 1, "b_usd": 6.1, "s_usd": 367.2, "net": 361.1, "b_mc": 300.0, "s_mc": 19200.0, "role": "sniper"}, {"w": "Wallet_14", "b": 13, "s": 9, "b_usd": 716.7, "s_usd": 1065.0, "net": 348.3, "b_mc": 34000.0, "s_mc": 51200.0, "role": "mm"}, {"w": "Wallet_121", "b": 1, "s": 1, "b_usd": 5.6, "s_usd": 339.5, "net": 333.9, "b_mc": 300.0, "s_mc": 18700.0, "role": "sniper"}, {"w": "Wallet_119", "b": 1, "s": 1, "b_usd": 5.8, "s_usd": 337.4, "net": 331.6, "b_mc": 300.0, "s_mc": 19700.0, "role": "sniper"}, {"w": "Wallet_112", "b": 1, "s": 1, "b_usd": 6.1, "s_usd": 293.1, "net": 287.0, "b_mc": 400.0, "s_mc": 19500.0, "role": "sniper"}, {"w": "Wallet_105", "b": 1, "s": 1, "b_usd": 6.3, "s_usd": 292.9, "net": 286.6, "b_mc": 400.0, "s_mc": 18100.0, "role": "sniper"}, {"w": "Wallet_24", "b": 12, "s": 7, "b_usd": 635.8, "s_usd": 913.2, "net": 277.4, "b_mc": 31500.0, "s_mc": 30200.0, "role": "mm"}, {"w": "Wallet_71", "b": 7, "s": 5, "b_usd": 396.5, "s_usd": 666.3, "net": 269.7, "b_mc": 33800.0, "s_mc": 35300.0, "role": "mm"}, {"w": "Wallet_100", "b": 3, "s": 2, "b_usd": 201.9, "s_usd": 468.5, "net": 266.6, "b_mc": 20300.0, "s_mc": 67700.0, "role": "passive"}, {"w": "Wallet_109", "b": 1, "s": 1, "b_usd": 6.2, "s_usd": 268.4, "net": 262.2, "b_mc": 400.0, "s_mc": 18400.0, "role": "sniper"}, {"w": "Wallet_124", "b": 1, "s": 1, "b_usd": 5.2, "s_usd": 262.2, "net": 256.9, "b_mc": 300.0, "s_mc": 17200.0, "role": "sniper"}, {"w": "Wallet_106", "b": 1, "s": 1, "b_usd": 6.3, "s_usd": 254.1, "net": 247.8, "b_mc": 500.0, "s_mc": 19300.0, "role": "sniper"}, {"w": "Wallet_125", "b": 1, "s": 1, "b_usd": 5.2, "s_usd": 250.0, "net": 244.8, "b_mc": 400.0, "s_mc": 18000.0, "role": "sniper"}, {"w": "Wallet_35", "b": 9, "s": 7, "b_usd": 576.2, "s_usd": 817.7, "net": 241.5, "b_mc": 30200.0, "s_mc": 54700.0, "role": "mm"}, {"w": "Wallet_34", "b": 10, "s": 7, "b_usd": 578.4, "s_usd": 819.7, "net": 241.3, "b_mc": 35900.0, "s_mc": 34800.0, "role": "mm"}, {"w": "Wallet_122", "b": 1, "s": 1, "b_usd": 5.5, "s_usd": 244.6, "net": 239.2, "b_mc": 400.0, "s_mc": 19000.0, "role": "sniper"}, {"w": "Wallet_75", "b": 11, "s": 8, "b_usd": 375.4, "s_usd": 594.5, "net": 219.0, "b_mc": 35300.0, "s_mc": 55000.0, "role": "mm"}, {"w": "Wallet_28", "b": 8, "s": 8, "b_usd": 592.5, "s_usd": 809.4, "net": 216.9, "b_mc": 53800.0, "s_mc": 49800.0, "role": "mm"}, {"w": "Wallet_127", "b": 1, "s": 1, "b_usd": 4.8, "s_usd": 221.4, "net": 216.6, "b_mc": 300.0, "s_mc": 14600.0, "role": "sniper"}, {"w": "Wallet_19", "b": 12, "s": 7, "b_usd": 680.4, "s_usd": 896.6, "net": 216.2, "b_mc": 33900.0, "s_mc": 47900.0, "role": "mm"}, {"w": "Wallet_129", "b": 1, "s": 1, "b_usd": 4.8, "s_usd": 219.4, "net": 214.6, "b_mc": 400.0, "s_mc": 18500.0, "role": "sniper"}, {"w": "Wallet_115", "b": 1, "s": 1, "b_usd": 6.0, "s_usd": 219.2, "net": 213.3, "b_mc": 500.0, "s_mc": 18000.0, "role": "sniper"}], "snipers_n": 25, "mms_n": 98, "passive_n": 8, "sol_usd": 92.3, "peak_usd": 67790, "start_usd": 4000};
 
-// Stats
-const peakMC = Math.max(...DATA.timeline.map(x=>x.mcap));
-const totalTB = DATA.timeline.reduce((a,x)=>a+x.tb,0);
-const totalTS = DATA.timeline.reduce((a,x)=>a+x.ts,0);
-const totalTB_usd = DATA.timeline.reduce((a,x)=>a+x.tb_usd,0);
-const totalTS_usd = DATA.timeline.reduce((a,x)=>a+x.ts_usd,0);
-const statsEl = document.getElementById('stats-top');
-statsEl.innerHTML = [
-  {l:'Старт MC',v:'~$4,000',s:'pump.fun bonding curve'},
-  {l:'Пик MC',v:'$'+peakMC.toLocaleString('en',{maximumFractionDigits:0}),s:'перед финальным дампом'},
-  {l:'Длительность',v:'~26 мин',s:'от первой до последней сделки'},
-  {l:'Снайперы / MM-боты',v:DATA.snipers_n+' / '+DATA.mms_n,s:'типов из 131 кошелька'},
-  {l:'Team BUY всего',v:'$'+Math.round(totalTB_usd).toLocaleString(),s:totalTB+' транзакций'},
-  {l:'Team SELL всего',v:'$'+Math.round(totalTS_usd).toLocaleString(),s:totalTS+' транзакций'},
+function showTab(id){
+  document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+
+<script>
+const T1DATA = {"timeline": [{"sec": 0, "mcap": 9313.0, "tb": 51, "ts": 7, "ob": 47, "os": 74, "tb_usd": 3901.0, "ts_usd": 469.0, "ob_usd": 4865.0, "os_usd": 7600.0}, {"sec": 30, "mcap": 13791.0, "tb": 24, "ts": 8, "ob": 39, "os": 55, "tb_usd": 2028.0, "ts_usd": 1413.0, "ob_usd": 1807.0, "os_usd": 2357.0}, {"sec": 60, "mcap": 15706.0, "tb": 23, "ts": 6, "ob": 28, "os": 45, "tb_usd": 1735.0, "ts_usd": 1195.0, "ob_usd": 1509.0, "os_usd": 1998.0}, {"sec": 90, "mcap": 18616.0, "tb": 23, "ts": 5, "ob": 35, "os": 53, "tb_usd": 1651.0, "ts_usd": 1236.0, "ob_usd": 2168.0, "os_usd": 2524.0}, {"sec": 120, "mcap": 19445.0, "tb": 28, "ts": 8, "ob": 33, "os": 53, "tb_usd": 2510.0, "ts_usd": 2455.0, "ob_usd": 2894.0, "os_usd": 2982.0}, {"sec": 150, "mcap": 21803.0, "tb": 23, "ts": 7, "ob": 33, "os": 49, "tb_usd": 1351.0, "ts_usd": 584.0, "ob_usd": 1032.0, "os_usd": 1760.0}, {"sec": 180, "mcap": 22636.0, "tb": 14, "ts": 12, "ob": 33, "os": 36, "tb_usd": 690.0, "ts_usd": 620.0, "ob_usd": 940.0, "os_usd": 1033.0}, {"sec": 210, "mcap": 23665.0, "tb": 16, "ts": 9, "ob": 35, "os": 42, "tb_usd": 801.0, "ts_usd": 769.0, "ob_usd": 1369.0, "os_usd": 1443.0}, {"sec": 240, "mcap": 24583.0, "tb": 21, "ts": 10, "ob": 25, "os": 36, "tb_usd": 1064.0, "ts_usd": 909.0, "ob_usd": 1340.0, "os_usd": 1461.0}, {"sec": 270, "mcap": 27797.0, "tb": 14, "ts": 8, "ob": 38, "os": 44, "tb_usd": 950.0, "ts_usd": 503.0, "ob_usd": 1404.0, "os_usd": 1806.0}, {"sec": 300, "mcap": 32073.0, "tb": 3, "ts": 11, "ob": 44, "os": 36, "tb_usd": 238.0, "ts_usd": 657.0, "ob_usd": 1624.0, "os_usd": 1170.0}, {"sec": 330, "mcap": 29772.0, "tb": 22, "ts": 8, "ob": 38, "os": 52, "tb_usd": 927.0, "ts_usd": 610.0, "ob_usd": 996.0, "os_usd": 1324.0}, {"sec": 360, "mcap": 31483.0, "tb": 26, "ts": 10, "ob": 37, "os": 54, "tb_usd": 1505.0, "ts_usd": 1439.0, "ob_usd": 1927.0, "os_usd": 1943.0}, {"sec": 390, "mcap": 31888.0, "tb": 13, "ts": 17, "ob": 34, "os": 30, "tb_usd": 778.0, "ts_usd": 968.0, "ob_usd": 1165.0, "os_usd": 948.0}, {"sec": 420, "mcap": 32052.0, "tb": 24, "ts": 16, "ob": 36, "os": 44, "tb_usd": 1565.0, "ts_usd": 1363.0, "ob_usd": 1777.0, "os_usd": 1929.0}, {"sec": 450, "mcap": 33484.0, "tb": 23, "ts": 16, "ob": 34, "os": 41, "tb_usd": 1304.0, "ts_usd": 1504.0, "ob_usd": 1870.0, "os_usd": 1616.0}, {"sec": 480, "mcap": 33938.0, "tb": 26, "ts": 10, "ob": 36, "os": 52, "tb_usd": 902.0, "ts_usd": 1105.0, "ob_usd": 1618.0, "os_usd": 1440.0}, {"sec": 510, "mcap": 33822.0, "tb": 20, "ts": 10, "ob": 36, "os": 46, "tb_usd": 949.0, "ts_usd": 753.0, "ob_usd": 1538.0, "os_usd": 1695.0}, {"sec": 540, "mcap": 32869.0, "tb": 25, "ts": 11, "ob": 31, "os": 45, "tb_usd": 1087.0, "ts_usd": 1032.0, "ob_usd": 1370.0, "os_usd": 1406.0}, {"sec": 570, "mcap": 34041.0, "tb": 26, "ts": 12, "ob": 38, "os": 52, "tb_usd": 1377.0, "ts_usd": 1153.0, "ob_usd": 1694.0, "os_usd": 1870.0}, {"sec": 600, "mcap": 35231.0, "tb": 21, "ts": 16, "ob": 42, "os": 47, "tb_usd": 1098.0, "ts_usd": 1565.0, "ob_usd": 2184.0, "os_usd": 1666.0}, {"sec": 630, "mcap": 33866.0, "tb": 23, "ts": 11, "ob": 26, "os": 37, "tb_usd": 764.0, "ts_usd": 779.0, "ob_usd": 1193.0, "os_usd": 1074.0}, {"sec": 660, "mcap": 34562.0, "tb": 24, "ts": 11, "ob": 29, "os": 42, "tb_usd": 1362.0, "ts_usd": 1497.0, "ob_usd": 1744.0, "os_usd": 1504.0}, {"sec": 690, "mcap": 34009.0, "tb": 25, "ts": 10, "ob": 30, "os": 45, "tb_usd": 1220.0, "ts_usd": 1687.0, "ob_usd": 2141.0, "os_usd": 1620.0}, {"sec": 720, "mcap": 33607.0, "tb": 27, "ts": 12, "ob": 29, "os": 44, "tb_usd": 1021.0, "ts_usd": 737.0, "ob_usd": 1100.0, "os_usd": 1386.0}, {"sec": 750, "mcap": 39829.0, "tb": 11, "ts": 11, "ob": 71, "os": 35, "tb_usd": 722.0, "ts_usd": 1165.0, "ob_usd": 1489.0, "os_usd": 9268.0}, {"sec": 780, "mcap": 36519.0, "tb": 13, "ts": 11, "ob": 47, "os": 8, "tb_usd": 636.0, "ts_usd": 1073.0, "ob_usd": 712.0, "os_usd": 250.0}, {"sec": 810, "mcap": 46038.0, "tb": 15, "ts": 11, "ob": 41, "os": 25, "tb_usd": 1203.0, "ts_usd": 872.0, "ob_usd": 1408.0, "os_usd": 636.0}, {"sec": 840, "mcap": 45414.0, "tb": 16, "ts": 15, "ob": 30, "os": 9, "tb_usd": 852.0, "ts_usd": 1535.0, "ob_usd": 533.0, "os_usd": 87.0}, {"sec": 870, "mcap": 51006.0, "tb": 12, "ts": 9, "ob": 25, "os": 19, "tb_usd": 822.0, "ts_usd": 491.0, "ob_usd": 773.0, "os_usd": 390.0}, {"sec": 900, "mcap": 54078.0, "tb": 12, "ts": 12, "ob": 28, "os": 17, "tb_usd": 660.0, "ts_usd": 763.0, "ob_usd": 373.0, "os_usd": 422.0}, {"sec": 930, "mcap": 54408.0, "tb": 14, "ts": 13, "ob": 17, "os": 9, "tb_usd": 451.0, "ts_usd": 1050.0, "ob_usd": 315.0, "os_usd": 290.0}, {"sec": 960, "mcap": 52546.0, "tb": 14, "ts": 10, "ob": 20, "os": 10, "tb_usd": 891.0, "ts_usd": 910.0, "ob_usd": 200.0, "os_usd": 468.0}, {"sec": 990, "mcap": 52642.0, "tb": 8, "ts": 13, "ob": 15, "os": 18, "tb_usd": 809.0, "ts_usd": 839.0, "ob_usd": 409.0, "os_usd": 210.0}, {"sec": 1020, "mcap": 54321.0, "tb": 9, "ts": 13, "ob": 18, "os": 4, "tb_usd": 657.0, "ts_usd": 1201.0, "ob_usd": 384.0, "os_usd": 6.0}, {"sec": 1050, "mcap": 56698.0, "tb": 17, "ts": 8, "ob": 14, "os": 10, "tb_usd": 1070.0, "ts_usd": 707.0, "ob_usd": 408.0, "os_usd": 257.0}, {"sec": 1080, "mcap": 54255.0, "tb": 11, "ts": 10, "ob": 25, "os": 10, "tb_usd": 567.0, "ts_usd": 907.0, "ob_usd": 337.0, "os_usd": 512.0}, {"sec": 1110, "mcap": 51645.0, "tb": 14, "ts": 7, "ob": 15, "os": 8, "tb_usd": 698.0, "ts_usd": 741.0, "ob_usd": 693.0, "os_usd": 91.0}, {"sec": 1140, "mcap": 61025.0, "tb": 18, "ts": 10, "ob": 27, "os": 19, "tb_usd": 867.0, "ts_usd": 742.0, "ob_usd": 715.0, "os_usd": 692.0}, {"sec": 1170, "mcap": 55999.0, "tb": 12, "ts": 12, "ob": 12, "os": 9, "tb_usd": 757.0, "ts_usd": 1225.0, "ob_usd": 99.0, "os_usd": 119.0}, {"sec": 1200, "mcap": 59874.0, "tb": 12, "ts": 7, "ob": 15, "os": 8, "tb_usd": 653.0, "ts_usd": 690.0, "ob_usd": 575.0, "os_usd": 91.0}, {"sec": 1230, "mcap": 61222.0, "tb": 12, "ts": 14, "ob": 29, "os": 12, "tb_usd": 569.0, "ts_usd": 969.0, "ob_usd": 577.0, "os_usd": 506.0}, {"sec": 1260, "mcap": 60940.0, "tb": 14, "ts": 8, "ob": 19, "os": 5, "tb_usd": 693.0, "ts_usd": 904.0, "ob_usd": 273.0, "os_usd": 97.0}, {"sec": 1290, "mcap": 64766.0, "tb": 19, "ts": 7, "ob": 19, "os": 15, "tb_usd": 671.0, "ts_usd": 538.0, "ob_usd": 330.0, "os_usd": 490.0}, {"sec": 1320, "mcap": 67593.0, "tb": 12, "ts": 12, "ob": 21, "os": 17, "tb_usd": 803.0, "ts_usd": 1138.0, "ob_usd": 530.0, "os_usd": 151.0}, {"sec": 1350, "mcap": 70317.0, "tb": 19, "ts": 7, "ob": 19, "os": 18, "tb_usd": 963.0, "ts_usd": 791.0, "ob_usd": 636.0, "os_usd": 497.0}, {"sec": 1380, "mcap": 70291.0, "tb": 10, "ts": 15, "ob": 17, "os": 9, "tb_usd": 731.0, "ts_usd": 1269.0, "ob_usd": 405.0, "os_usd": 238.0}, {"sec": 1410, "mcap": 63327.0, "tb": 10, "ts": 13, "ob": 34, "os": 16, "tb_usd": 614.0, "ts_usd": 1314.0, "ob_usd": 867.0, "os_usd": 671.0}, {"sec": 1440, "mcap": 65639.0, "tb": 19, "ts": 10, "ob": 23, "os": 12, "tb_usd": 1223.0, "ts_usd": 725.0, "ob_usd": 576.0, "os_usd": 453.0}, {"sec": 1470, "mcap": 66892.0, "tb": 13, "ts": 13, "ob": 26, "os": 10, "tb_usd": 467.0, "ts_usd": 1130.0, "ob_usd": 630.0, "os_usd": 321.0}, {"sec": 1500, "mcap": 64010.0, "tb": 14, "ts": 15, "ob": 19, "os": 6, "tb_usd": 950.0, "ts_usd": 1266.0, "ob_usd": 638.0, "os_usd": 353.0}, {"sec": 1530, "mcap": 61144.0, "tb": 10, "ts": 12, "ob": 22, "os": 10, "tb_usd": 351.0, "ts_usd": 660.0, "ob_usd": 458.0, "os_usd": 532.0}, {"sec": 1560, "mcap": 3085.0, "tb": 0, "ts": 91, "ob": 12, "os": 115, "tb_usd": 0, "ts_usd": 7326.0, "ob_usd": 85.0, "os_usd": 222.0}, {"sec": 1590, "mcap": 2607.0, "tb": 0, "ts": 0, "ob": 4, "os": 48, "tb_usd": 0, "ts_usd": 0, "ob_usd": 123.0, "os_usd": 125.0}, {"sec": 1620, "mcap": 2511.0, "tb": 0, "ts": 0, "ob": 4, "os": 24, "tb_usd": 0, "ts_usd": 0, "ob_usd": 6.0, "os_usd": 129.0}, {"sec": 1650, "mcap": 2462.0, "tb": 0, "ts": 0, "ob": 0, "os": 9, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 11.0}, {"sec": 1680, "mcap": 2563.0, "tb": 0, "ts": 0, "ob": 5, "os": 10, "tb_usd": 0, "ts_usd": 0, "ob_usd": 54.0, "os_usd": 17.0}, {"sec": 1710, "mcap": 2496.0, "tb": 0, "ts": 0, "ob": 5, "os": 10, "tb_usd": 0, "ts_usd": 0, "ob_usd": 82.0, "os_usd": 16.0}, {"sec": 1740, "mcap": 1671.0, "tb": 0, "ts": 0, "ob": 0, "os": 3, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 1770, "mcap": 2748.0, "tb": 0, "ts": 0, "ob": 1, "os": 8, "tb_usd": 0, "ts_usd": 0, "ob_usd": 30.0, "os_usd": 12.0}, {"sec": 1800, "mcap": 3134.0, "tb": 0, "ts": 0, "ob": 12, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 155.0, "os_usd": 4.0}, {"sec": 1830, "mcap": 3479.0, "tb": 0, "ts": 0, "ob": 11, "os": 3, "tb_usd": 0, "ts_usd": 0, "ob_usd": 149.0, "os_usd": 56.0}, {"sec": 1860, "mcap": 3916.0, "tb": 0, "ts": 0, "ob": 6, "os": 5, "tb_usd": 0, "ts_usd": 0, "ob_usd": 59.0, "os_usd": 11.0}, {"sec": 1890, "mcap": 3788.0, "tb": 0, "ts": 0, "ob": 3, "os": 6, "tb_usd": 0, "ts_usd": 0, "ob_usd": 17.0, "os_usd": 67.0}, {"sec": 1920, "mcap": 3602.0, "tb": 0, "ts": 0, "ob": 0, "os": 5, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 33.0}, {"sec": 1950, "mcap": 3600.0, "tb": 0, "ts": 0, "ob": 1, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 8.0, "os_usd": 15.0}, {"sec": 1980, "mcap": 2888.0, "tb": 0, "ts": 0, "ob": 1, "os": 3, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 6.0}, {"sec": 2010, "mcap": 3745.0, "tb": 0, "ts": 0, "ob": 3, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 134.0, "os_usd": 5.0}, {"sec": 2040, "mcap": 4220.0, "tb": 0, "ts": 0, "ob": 7, "os": 3, "tb_usd": 0, "ts_usd": 0, "ob_usd": 112.0, "os_usd": 1.0}, {"sec": 2070, "mcap": 5027.0, "tb": 0, "ts": 0, "ob": 4, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 249.0, "os_usd": 7.0}, {"sec": 2100, "mcap": 5130.0, "tb": 0, "ts": 0, "ob": 4, "os": 3, "tb_usd": 0, "ts_usd": 0, "ob_usd": 46.0, "os_usd": 84.0}, {"sec": 2130, "mcap": 5161.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 2.0, "os_usd": 0}, {"sec": 2160, "mcap": 4712.0, "tb": 0, "ts": 0, "ob": 3, "os": 4, "tb_usd": 0, "ts_usd": 0, "ob_usd": 34.0, "os_usd": 62.0}, {"sec": 2190, "mcap": 4572.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 13.0}, {"sec": 2220, "mcap": 4318.0, "tb": 0, "ts": 0, "ob": 2, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 1.0, "os_usd": 4.0}, {"sec": 2250, "mcap": 4639.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 12.0}, {"sec": 2280, "mcap": 4823.0, "tb": 0, "ts": 0, "ob": 2, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 15.0, "os_usd": 2.0}, {"sec": 2310, "mcap": 4889.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 1.0, "os_usd": 0}, {"sec": 2340, "mcap": 4862.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 1.0, "os_usd": 4.0}, {"sec": 2370, "mcap": 4545.0, "tb": 0, "ts": 0, "ob": 0, "os": 3, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 54.0}, {"sec": 2400, "mcap": 4830.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 9.0, "os_usd": 0.0}, {"sec": 2430, "mcap": 5679.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 2.0, "os_usd": 4.0}, {"sec": 2460, "mcap": 4403.0, "tb": 0, "ts": 0, "ob": 0, "os": 4, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 9.0}, {"sec": 2490, "mcap": 4612.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 4.0, "os_usd": 1.0}, {"sec": 2520, "mcap": 4261.0, "tb": 0, "ts": 0, "ob": 0, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 115.0}, {"sec": 2550, "mcap": 4032.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 8.0}, {"sec": 2610, "mcap": 3964.0, "tb": 0, "ts": 0, "ob": 1, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 47.0}, {"sec": 2640, "mcap": 3843.0, "tb": 0, "ts": 0, "ob": 0, "os": 4, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 13.0}, {"sec": 2670, "mcap": 3489.0, "tb": 0, "ts": 0, "ob": 1, "os": 4, "tb_usd": 0, "ts_usd": 0, "ob_usd": 1.0, "os_usd": 140.0}, {"sec": 2700, "mcap": 3615.0, "tb": 0, "ts": 0, "ob": 2, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 8.0, "os_usd": 1.0}, {"sec": 2730, "mcap": 3662.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0}, {"sec": 2760, "mcap": 4.0, "tb": 0, "ts": 0, "ob": 1, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 1.0}, {"sec": 2820, "mcap": 3773.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0}, {"sec": 2880, "mcap": 7992.0, "tb": 0, "ts": 0, "ob": 0, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 21.0}, {"sec": 2910, "mcap": 63965.0, "tb": 0, "ts": 0, "ob": 0, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 86.0}, {"sec": 2940, "mcap": 3419.0, "tb": 0, "ts": 0, "ob": 2, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 34.0, "os_usd": 0}, {"sec": 2970, "mcap": 44857.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 2.0, "os_usd": 0.0}, {"sec": 3000, "mcap": 3449.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 5.0, "os_usd": 10.0}, {"sec": 3030, "mcap": 3170.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 9.0}, {"sec": 3120, "mcap": 3245.0, "tb": 0, "ts": 0, "ob": 2, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 1.0, "os_usd": 37.0}, {"sec": 3150, "mcap": 3186.0, "tb": 0, "ts": 0, "ob": 0, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 16.0}, {"sec": 3210, "mcap": 3300.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 1.0, "os_usd": 32.0}, {"sec": 3240, "mcap": 3016.0, "tb": 0, "ts": 0, "ob": 0, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 30.0}, {"sec": 3270, "mcap": 2835.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 96.0}, {"sec": 3330, "mcap": 2693.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 13.0}, {"sec": 3420, "mcap": 1712.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 3450, "mcap": 2666.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0.0}, {"sec": 3510, "mcap": 2215.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 3540, "mcap": 0.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0}, {"sec": 3570, "mcap": 0.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0}, {"sec": 3630, "mcap": 3260.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 13.0, "os_usd": 0}, {"sec": 3660, "mcap": 3506.0, "tb": 0, "ts": 0, "ob": 2, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 86.0, "os_usd": 0}, {"sec": 3690, "mcap": 2.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0}, {"sec": 3720, "mcap": 3535.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 6.0, "os_usd": 0}, {"sec": 3750, "mcap": 3605.0, "tb": 0, "ts": 0, "ob": 5, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 85.0, "os_usd": 1.0}, {"sec": 3780, "mcap": 3449.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 72.0}, {"sec": 3810, "mcap": 186.0, "tb": 0, "ts": 0, "ob": 2, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0}, {"sec": 3900, "mcap": 3523.0, "tb": 0, "ts": 0, "ob": 3, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 15.0, "os_usd": 0}, {"sec": 3930, "mcap": 3563.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 5.0, "os_usd": 0.0}, {"sec": 3960, "mcap": 4762.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0}, {"sec": 3990, "mcap": 1828.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 4020, "mcap": 3504.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 6.0}, {"sec": 4170, "mcap": 3471.0, "tb": 0, "ts": 0, "ob": 0, "os": 3, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 3.0}, {"sec": 4260, "mcap": 3531.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 43.0, "os_usd": 0.0}, {"sec": 4290, "mcap": 2984.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 4.0}, {"sec": 4350, "mcap": 3439.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 3.0}, {"sec": 4380, "mcap": 3818.0, "tb": 0, "ts": 0, "ob": 2, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 14.0, "os_usd": 0}, {"sec": 4440, "mcap": 3429.0, "tb": 0, "ts": 0, "ob": 0, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 9.0}, {"sec": 4470, "mcap": 3650.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 24.0, "os_usd": 0}, {"sec": 4500, "mcap": 218.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 4590, "mcap": 3436.0, "tb": 0, "ts": 0, "ob": 1, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 7.0, "os_usd": 9.0}, {"sec": 4770, "mcap": 4062.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 8.0, "os_usd": 13.0}, {"sec": 4800, "mcap": 4029.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 6.0, "os_usd": 0}, {"sec": 4950, "mcap": 3747.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 5040, "mcap": 3763.0, "tb": 0, "ts": 0, "ob": 0, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 11.0}, {"sec": 5070, "mcap": 26.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0}, {"sec": 5100, "mcap": 45.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0}, {"sec": 5160, "mcap": 3405.0, "tb": 0, "ts": 0, "ob": 0, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 3.0}, {"sec": 5190, "mcap": 20.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0}, {"sec": 5250, "mcap": 3945.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 2.0, "os_usd": 0}, {"sec": 5310, "mcap": 3445.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 2.0}, {"sec": 5340, "mcap": 3413.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 9.0}, {"sec": 5370, "mcap": 105.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 5460, "mcap": 9.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 5490, "mcap": 3312.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 5580, "mcap": 3289.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 5.0}, {"sec": 5610, "mcap": 3285.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 2.0}, {"sec": 5700, "mcap": 3345.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 4.0}, {"sec": 5730, "mcap": 3499.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 15.0, "os_usd": 0}, {"sec": 5850, "mcap": 17923.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 42.0, "os_usd": 43.0}, {"sec": 5910, "mcap": 1.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 6000, "mcap": 0.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 6030, "mcap": 2928.0, "tb": 0, "ts": 0, "ob": 0, "os": 3, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 14.0}, {"sec": 6090, "mcap": 8.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 6150, "mcap": 2888.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 8.0}, {"sec": 6180, "mcap": 2918.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 3.0}, {"sec": 6360, "mcap": 2873.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 44.0}, {"sec": 6780, "mcap": 1660.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 6870, "mcap": 2725.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 6960, "mcap": 2714.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 9.0}, {"sec": 7350, "mcap": 2707.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 3.0}, {"sec": 7380, "mcap": 2763.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 2.0}, {"sec": 7620, "mcap": 2.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 7740, "mcap": 1254.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 7770, "mcap": 2408.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 2.0}, {"sec": 7830, "mcap": 4.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 7860, "mcap": 2660.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 8220, "mcap": 0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 2.0}, {"sec": 8430, "mcap": 2557.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 8550, "mcap": 2793.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 8670, "mcap": 2355.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 6.0}, {"sec": 8910, "mcap": 2907.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 2.0, "os_usd": 0}, {"sec": 9120, "mcap": 2753.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 9780, "mcap": 18.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 10290, "mcap": 2587.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 11070, "mcap": 65.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 11190, "mcap": 0.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 11820, "mcap": 14.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 12150, "mcap": 2517.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 5.0}, {"sec": 12240, "mcap": 0.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 12480, "mcap": 2306.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 6.0}, {"sec": 12510, "mcap": 7778.0, "tb": 0, "ts": 0, "ob": 3, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 30.0, "os_usd": 0}, {"sec": 12630, "mcap": 2451.0, "tb": 0, "ts": 0, "ob": 0, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 13380, "mcap": 2214.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0}, {"sec": 13440, "mcap": 248.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0}, {"sec": 13470, "mcap": 66.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0}, {"sec": 13500, "mcap": 235.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0}, {"sec": 14430, "mcap": 3036.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 1.0, "os_usd": 0}, {"sec": 14550, "mcap": 12285.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 14610, "mcap": 0.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0}, {"sec": 14640, "mcap": 2866.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 3.0, "os_usd": 0}, {"sec": 14700, "mcap": 3451.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 2.0, "os_usd": 0}, {"sec": 14850, "mcap": 2786.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 9.0, "os_usd": 0}, {"sec": 15420, "mcap": 2240.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 15540, "mcap": 2549.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 5.0}, {"sec": 16770, "mcap": 2464.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 14.0}, {"sec": 16890, "mcap": 2324.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 16980, "mcap": 2443.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 10.0}, {"sec": 18210, "mcap": 2459.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 2.0}, {"sec": 18630, "mcap": 2030.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 19200, "mcap": 1.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 19230, "mcap": 0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 22110, "mcap": 2347.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 3.0}, {"sec": 23820, "mcap": 2427.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 3.0}, {"sec": 24750, "mcap": 2013.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 27660, "mcap": 2257.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 27960, "mcap": 2418.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 28080, "mcap": 2352.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 77.0}, {"sec": 28260, "mcap": 2243.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 29730, "mcap": 2239.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 3.0}, {"sec": 30810, "mcap": 50.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 31890, "mcap": 2202.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 33000, "mcap": 2690.0, "tb": 0, "ts": 0, "ob": 2, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 2.0, "os_usd": 0}, {"sec": 33630, "mcap": 2356.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 2.0}, {"sec": 35040, "mcap": 2353.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 3.0}, {"sec": 38670, "mcap": 3.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 45600, "mcap": 1405.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 45990, "mcap": 2546.0, "tb": 0, "ts": 0, "ob": 4, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 71.0, "os_usd": 0}, {"sec": 46860, "mcap": 2535.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 49560, "mcap": 2468.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 49590, "mcap": 2.0, "tb": 0, "ts": 0, "ob": 0, "os": 3, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 66.0}, {"sec": 50280, "mcap": 2233.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 52260, "mcap": 2287.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 52350, "mcap": 27.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 52410, "mcap": 2240.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 53130, "mcap": 131.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 55110, "mcap": 2131.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 57750, "mcap": 2252.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 60810, "mcap": 10.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 63150, "mcap": 2189.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 30.0}, {"sec": 65250, "mcap": 2136.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 69330, "mcap": 15248.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 71430, "mcap": 2085.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 7.0}, {"sec": 74400, "mcap": 1838.0, "tb": 0, "ts": 0, "ob": 0, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 78330, "mcap": 3849.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 80100, "mcap": 13095.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 85500, "mcap": 1902.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 4.0}, {"sec": 91890, "mcap": 1959.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 96600, "mcap": 14.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 97560, "mcap": 630.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 99450, "mcap": 1945.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 102150, "mcap": 1895.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 112980, "mcap": 1935.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 119580, "mcap": 0.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 121920, "mcap": 1503.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 126150, "mcap": 0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 138000, "mcap": 1788.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 27.0}, {"sec": 144240, "mcap": 1675.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 148620, "mcap": 0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 2.0}, {"sec": 152100, "mcap": 14072.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 152130, "mcap": 1768.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 153360, "mcap": 1464.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 157140, "mcap": 1350.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 3.0}, {"sec": 157560, "mcap": 1741.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 4.0}, {"sec": 160650, "mcap": 272.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 161250, "mcap": 1708.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 168810, "mcap": 1615.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 172830, "mcap": 0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 190170, "mcap": 0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 222240, "mcap": 2.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 232200, "mcap": 1728.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 2.0}, {"sec": 243660, "mcap": 1711.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 1.0}, {"sec": 244950, "mcap": 1705.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 0.0}, {"sec": 260640, "mcap": 1723.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 2.0}, {"sec": 270240, "mcap": 1668.0, "tb": 0, "ts": 0, "ob": 0, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0, "os_usd": 13.0}], "zones": {"A": {"nb": 142, "ns": 107, "b_usd_p50": 49, "s_usd_p50": 48, "b_tok_p50": 6226680, "s_tok_p50": 7529204, "b_usd_total": 11070, "s_usd_total": 10077, "label": "A: <$20k"}, "B": {"nb": 443, "ns": 255, "b_usd_p50": 34, "s_usd_p50": 75, "b_tok_p50": 1146299, "s_tok_p50": 2544867, "b_usd_total": 23056, "s_usd_total": 23792, "label": "B: $20k–$40k"}, "C": {"nb": 115, "ns": 127, "b_usd_p50": 49, "s_usd_p50": 91, "b_tok_p50": 947722, "s_tok_p50": 1873078, "b_usd_total": 6895, "s_usd_total": 12614, "label": "C: $40k–$55k"}, "D": {"nb": 198, "ns": 158, "b_usd_p50": 40, "s_usd_p50": 75, "b_tok_p50": 625830, "s_tok_p50": 1215779, "b_usd_total": 10581, "s_usd_total": 13242, "label": "D: $55k–$70k"}, "E": {"nb": 27, "ns": 3, "b_usd_p50": 42, "s_usd_p50": 50, "b_tok_p50": 594767, "s_tok_p50": 701108, "b_usd_total": 1525, "s_usd_total": 220, "label": "E: >$70k"}}, "wallets": [{"w": "Wallet_85", "b": 8, "s": 7, "b_usd": 320.3, "s_usd": 766.4, "net": 446.1, "b_mc": 35000.0, "s_mc": 58600.0, "role": "mm"}, {"w": "Wallet_7", "b": 10, "s": 6, "b_usd": 813.9, "s_usd": 1216.3, "net": 402.4, "b_mc": 33000.0, "s_mc": 46400.0, "role": "mm"}, {"w": "Wallet_117", "b": 1, "s": 1, "b_usd": 5.9, "s_usd": 387.1, "net": 381.2, "b_mc": 300.0, "s_mc": 19000.0, "role": "sniper"}, {"w": "Wallet_113", "b": 1, "s": 1, "b_usd": 6.1, "s_usd": 367.2, "net": 361.1, "b_mc": 300.0, "s_mc": 19200.0, "role": "sniper"}, {"w": "Wallet_14", "b": 13, "s": 9, "b_usd": 716.7, "s_usd": 1065.0, "net": 348.3, "b_mc": 34000.0, "s_mc": 51200.0, "role": "mm"}, {"w": "Wallet_121", "b": 1, "s": 1, "b_usd": 5.6, "s_usd": 339.5, "net": 333.9, "b_mc": 300.0, "s_mc": 18700.0, "role": "sniper"}, {"w": "Wallet_119", "b": 1, "s": 1, "b_usd": 5.8, "s_usd": 337.4, "net": 331.6, "b_mc": 300.0, "s_mc": 19700.0, "role": "sniper"}, {"w": "Wallet_112", "b": 1, "s": 1, "b_usd": 6.1, "s_usd": 293.1, "net": 287.0, "b_mc": 400.0, "s_mc": 19500.0, "role": "sniper"}, {"w": "Wallet_105", "b": 1, "s": 1, "b_usd": 6.3, "s_usd": 292.9, "net": 286.6, "b_mc": 400.0, "s_mc": 18100.0, "role": "sniper"}, {"w": "Wallet_24", "b": 12, "s": 7, "b_usd": 635.8, "s_usd": 913.2, "net": 277.4, "b_mc": 31500.0, "s_mc": 30200.0, "role": "mm"}, {"w": "Wallet_71", "b": 7, "s": 5, "b_usd": 396.5, "s_usd": 666.3, "net": 269.7, "b_mc": 33800.0, "s_mc": 35300.0, "role": "mm"}, {"w": "Wallet_100", "b": 3, "s": 2, "b_usd": 201.9, "s_usd": 468.5, "net": 266.6, "b_mc": 20300.0, "s_mc": 67700.0, "role": "passive"}, {"w": "Wallet_109", "b": 1, "s": 1, "b_usd": 6.2, "s_usd": 268.4, "net": 262.2, "b_mc": 400.0, "s_mc": 18400.0, "role": "sniper"}, {"w": "Wallet_124", "b": 1, "s": 1, "b_usd": 5.2, "s_usd": 262.2, "net": 256.9, "b_mc": 300.0, "s_mc": 17200.0, "role": "sniper"}, {"w": "Wallet_106", "b": 1, "s": 1, "b_usd": 6.3, "s_usd": 254.1, "net": 247.8, "b_mc": 500.0, "s_mc": 19300.0, "role": "sniper"}, {"w": "Wallet_125", "b": 1, "s": 1, "b_usd": 5.2, "s_usd": 250.0, "net": 244.8, "b_mc": 400.0, "s_mc": 18000.0, "role": "sniper"}, {"w": "Wallet_35", "b": 9, "s": 7, "b_usd": 576.2, "s_usd": 817.7, "net": 241.5, "b_mc": 30200.0, "s_mc": 54700.0, "role": "mm"}, {"w": "Wallet_34", "b": 10, "s": 7, "b_usd": 578.4, "s_usd": 819.7, "net": 241.3, "b_mc": 35900.0, "s_mc": 34800.0, "role": "mm"}, {"w": "Wallet_122", "b": 1, "s": 1, "b_usd": 5.5, "s_usd": 244.6, "net": 239.2, "b_mc": 400.0, "s_mc": 19000.0, "role": "sniper"}, {"w": "Wallet_75", "b": 11, "s": 8, "b_usd": 375.4, "s_usd": 594.5, "net": 219.0, "b_mc": 35300.0, "s_mc": 55000.0, "role": "mm"}, {"w": "Wallet_28", "b": 8, "s": 8, "b_usd": 592.5, "s_usd": 809.4, "net": 216.9, "b_mc": 53800.0, "s_mc": 49800.0, "role": "mm"}, {"w": "Wallet_127", "b": 1, "s": 1, "b_usd": 4.8, "s_usd": 221.4, "net": 216.6, "b_mc": 300.0, "s_mc": 14600.0, "role": "sniper"}, {"w": "Wallet_19", "b": 12, "s": 7, "b_usd": 680.4, "s_usd": 896.6, "net": 216.2, "b_mc": 33900.0, "s_mc": 47900.0, "role": "mm"}, {"w": "Wallet_129", "b": 1, "s": 1, "b_usd": 4.8, "s_usd": 219.4, "net": 214.6, "b_mc": 400.0, "s_mc": 18500.0, "role": "sniper"}, {"w": "Wallet_115", "b": 1, "s": 1, "b_usd": 6.0, "s_usd": 219.2, "net": 213.3, "b_mc": 500.0, "s_mc": 18000.0, "role": "sniper"}], "snipers_n": 25, "mms_n": 98, "passive_n": 8, "sol_usd": 92.3, "peak_usd": 67790, "start_usd": 4000};
+const T2DATA = {"timeline2": [{"sec": 0, "mcap": 11455.0, "tb": 25, "ts": 0, "ob": 98, "os": 106, "tb_usd": 2210.0, "ts_usd": 0, "ob_usd": 9541.0, "os_usd": 10998.0}, {"sec": 30, "mcap": 16930.0, "tb": 27, "ts": 0, "ob": 37, "os": 65, "tb_usd": 2101.0, "ts_usd": 0, "ob_usd": 2844.0, "os_usd": 4976.0}, {"sec": 60, "mcap": 18211.0, "tb": 24, "ts": 0, "ob": 20, "os": 44, "tb_usd": 1820.0, "ts_usd": 0, "ob_usd": 2243.0, "os_usd": 4001.0}, {"sec": 90, "mcap": 20065.0, "tb": 27, "ts": 0, "ob": 22, "os": 49, "tb_usd": 1587.0, "ts_usd": 0, "ob_usd": 1587.0, "os_usd": 3124.0}, {"sec": 120, "mcap": 20743.0, "tb": 25, "ts": 0, "ob": 20, "os": 45, "tb_usd": 1367.0, "ts_usd": 0, "ob_usd": 1565.0, "os_usd": 2888.0}, {"sec": 150, "mcap": 20901.0, "tb": 24, "ts": 0, "ob": 12, "os": 36, "tb_usd": 977.0, "ts_usd": 0, "ob_usd": 1014.0, "os_usd": 1962.0}, {"sec": 180, "mcap": 20362.0, "tb": 19, "ts": 9, "ob": 15, "os": 25, "tb_usd": 372.0, "ts_usd": 419.0, "ob_usd": 880.0, "os_usd": 813.0}, {"sec": 210, "mcap": 21192.0, "tb": 14, "ts": 8, "ob": 14, "os": 20, "tb_usd": 555.0, "ts_usd": 385.0, "ob_usd": 444.0, "os_usd": 600.0}, {"sec": 240, "mcap": 20541.0, "tb": 11, "ts": 13, "ob": 23, "os": 20, "tb_usd": 402.0, "ts_usd": 429.0, "ob_usd": 728.0, "os_usd": 562.0}, {"sec": 270, "mcap": 20075.0, "tb": 18, "ts": 16, "ob": 25, "os": 27, "tb_usd": 897.0, "ts_usd": 729.0, "ob_usd": 788.0, "os_usd": 932.0}, {"sec": 300, "mcap": 20355.0, "tb": 18, "ts": 14, "ob": 17, "os": 21, "tb_usd": 492.0, "ts_usd": 596.0, "ob_usd": 644.0, "os_usd": 525.0}, {"sec": 330, "mcap": 21437.0, "tb": 18, "ts": 12, "ob": 21, "os": 27, "tb_usd": 491.0, "ts_usd": 369.0, "ob_usd": 828.0, "os_usd": 926.0}, {"sec": 360, "mcap": 22284.0, "tb": 20, "ts": 12, "ob": 17, "os": 25, "tb_usd": 854.0, "ts_usd": 535.0, "ob_usd": 656.0, "os_usd": 954.0}, {"sec": 390, "mcap": 22245.0, "tb": 13, "ts": 15, "ob": 21, "os": 19, "tb_usd": 389.0, "ts_usd": 536.0, "ob_usd": 650.0, "os_usd": 487.0}, {"sec": 420, "mcap": 23726.0, "tb": 18, "ts": 12, "ob": 29, "os": 35, "tb_usd": 948.0, "ts_usd": 520.0, "ob_usd": 786.0, "os_usd": 1274.0}, {"sec": 450, "mcap": 22934.0, "tb": 6, "ts": 12, "ob": 26, "os": 20, "tb_usd": 97.0, "ts_usd": 357.0, "ob_usd": 782.0, "os_usd": 423.0}, {"sec": 480, "mcap": 23762.0, "tb": 23, "ts": 12, "ob": 23, "os": 34, "tb_usd": 928.0, "ts_usd": 572.0, "ob_usd": 688.0, "os_usd": 1028.0}, {"sec": 510, "mcap": 25471.0, "tb": 8, "ts": 13, "ob": 29, "os": 24, "tb_usd": 432.0, "ts_usd": 477.0, "ob_usd": 802.0, "os_usd": 769.0}, {"sec": 540, "mcap": 26232.0, "tb": 18, "ts": 13, "ob": 24, "os": 29, "tb_usd": 452.0, "ts_usd": 295.0, "ob_usd": 628.0, "os_usd": 765.0}, {"sec": 570, "mcap": 25040.0, "tb": 11, "ts": 12, "ob": 17, "os": 16, "tb_usd": 389.0, "ts_usd": 440.0, "ob_usd": 620.0, "os_usd": 553.0}, {"sec": 600, "mcap": 26233.0, "tb": 17, "ts": 14, "ob": 29, "os": 32, "tb_usd": 507.0, "ts_usd": 471.0, "ob_usd": 1033.0, "os_usd": 1037.0}, {"sec": 630, "mcap": 26690.0, "tb": 18, "ts": 14, "ob": 23, "os": 27, "tb_usd": 571.0, "ts_usd": 584.0, "ob_usd": 695.0, "os_usd": 695.0}, {"sec": 660, "mcap": 28840.0, "tb": 16, "ts": 11, "ob": 28, "os": 33, "tb_usd": 566.0, "ts_usd": 396.0, "ob_usd": 767.0, "os_usd": 926.0}, {"sec": 690, "mcap": 29607.0, "tb": 16, "ts": 11, "ob": 25, "os": 30, "tb_usd": 415.0, "ts_usd": 465.0, "ob_usd": 896.0, "os_usd": 821.0}, {"sec": 720, "mcap": 30177.0, "tb": 18, "ts": 13, "ob": 25, "os": 30, "tb_usd": 498.0, "ts_usd": 507.0, "ob_usd": 984.0, "os_usd": 950.0}, {"sec": 750, "mcap": 24884.0, "tb": 24, "ts": 14, "ob": 35, "os": 45, "tb_usd": 730.0, "ts_usd": 1419.0, "ob_usd": 1646.0, "os_usd": 921.0}, {"sec": 780, "mcap": 24858.0, "tb": 22, "ts": 14, "ob": 23, "os": 31, "tb_usd": 362.0, "ts_usd": 424.0, "ob_usd": 519.0, "os_usd": 445.0}, {"sec": 810, "mcap": 25812.0, "tb": 17, "ts": 13, "ob": 17, "os": 21, "tb_usd": 741.0, "ts_usd": 532.0, "ob_usd": 603.0, "os_usd": 795.0}, {"sec": 840, "mcap": 26429.0, "tb": 16, "ts": 13, "ob": 20, "os": 23, "tb_usd": 413.0, "ts_usd": 423.0, "ob_usd": 474.0, "os_usd": 450.0}, {"sec": 870, "mcap": 27217.0, "tb": 18, "ts": 11, "ob": 20, "os": 27, "tb_usd": 608.0, "ts_usd": 373.0, "ob_usd": 421.0, "os_usd": 640.0}, {"sec": 900, "mcap": 28278.0, "tb": 14, "ts": 12, "ob": 19, "os": 21, "tb_usd": 441.0, "ts_usd": 472.0, "ob_usd": 583.0, "os_usd": 541.0}, {"sec": 930, "mcap": 30119.0, "tb": 25, "ts": 13, "ob": 23, "os": 35, "tb_usd": 765.0, "ts_usd": 444.0, "ob_usd": 843.0, "os_usd": 1130.0}, {"sec": 960, "mcap": 31016.0, "tb": 14, "ts": 15, "ob": 26, "os": 25, "tb_usd": 318.0, "ts_usd": 486.0, "ob_usd": 816.0, "os_usd": 628.0}, {"sec": 990, "mcap": 31770.0, "tb": 22, "ts": 12, "ob": 24, "os": 34, "tb_usd": 665.0, "ts_usd": 361.0, "ob_usd": 693.0, "os_usd": 973.0}, {"sec": 1020, "mcap": 33067.0, "tb": 10, "ts": 12, "ob": 26, "os": 24, "tb_usd": 459.0, "ts_usd": 508.0, "ob_usd": 853.0, "os_usd": 781.0}, {"sec": 1050, "mcap": 34046.0, "tb": 25, "ts": 13, "ob": 23, "os": 35, "tb_usd": 651.0, "ts_usd": 544.0, "ob_usd": 834.0, "os_usd": 917.0}, {"sec": 1080, "mcap": 32560.0, "tb": 21, "ts": 12, "ob": 19, "os": 28, "tb_usd": 656.0, "ts_usd": 798.0, "ob_usd": 1142.0, "os_usd": 970.0}, {"sec": 1110, "mcap": 31735.0, "tb": 12, "ts": 12, "ob": 21, "os": 21, "tb_usd": 432.0, "ts_usd": 451.0, "ob_usd": 625.0, "os_usd": 591.0}, {"sec": 1140, "mcap": 31696.0, "tb": 24, "ts": 12, "ob": 18, "os": 30, "tb_usd": 655.0, "ts_usd": 443.0, "ob_usd": 543.0, "os_usd": 738.0}, {"sec": 1170, "mcap": 32816.0, "tb": 11, "ts": 11, "ob": 22, "os": 23, "tb_usd": 401.0, "ts_usd": 533.0, "ob_usd": 944.0, "os_usd": 802.0}, {"sec": 1200, "mcap": 34129.0, "tb": 19, "ts": 13, "ob": 15, "os": 21, "tb_usd": 630.0, "ts_usd": 678.0, "ob_usd": 732.0, "os_usd": 667.0}, {"sec": 1230, "mcap": 33645.0, "tb": 26, "ts": 10, "ob": 18, "os": 34, "tb_usd": 543.0, "ts_usd": 789.0, "ob_usd": 995.0, "os_usd": 726.0}, {"sec": 1260, "mcap": 34559.0, "tb": 24, "ts": 11, "ob": 19, "os": 32, "tb_usd": 1030.0, "ts_usd": 723.0, "ob_usd": 820.0, "os_usd": 1114.0}, {"sec": 1290, "mcap": 35394.0, "tb": 26, "ts": 6, "ob": 13, "os": 34, "tb_usd": 597.0, "ts_usd": 798.0, "ob_usd": 867.0, "os_usd": 1032.0}, {"sec": 1320, "mcap": 35210.0, "tb": 15, "ts": 12, "ob": 18, "os": 22, "tb_usd": 737.0, "ts_usd": 598.0, "ob_usd": 746.0, "os_usd": 863.0}, {"sec": 1350, "mcap": 34957.0, "tb": 17, "ts": 12, "ob": 15, "os": 20, "tb_usd": 518.0, "ts_usd": 424.0, "ob_usd": 511.0, "os_usd": 591.0}, {"sec": 1380, "mcap": 34357.0, "tb": 15, "ts": 12, "ob": 15, "os": 18, "tb_usd": 394.0, "ts_usd": 534.0, "ob_usd": 582.0, "os_usd": 429.0}, {"sec": 1410, "mcap": 34436.0, "tb": 18, "ts": 13, "ob": 21, "os": 26, "tb_usd": 457.0, "ts_usd": 403.0, "ob_usd": 1058.0, "os_usd": 1089.0}, {"sec": 1440, "mcap": 30276.0, "tb": 14, "ts": 13, "ob": 20, "os": 21, "tb_usd": 475.0, "ts_usd": 365.0, "ob_usd": 431.0, "os_usd": 527.0}, {"sec": 1470, "mcap": 31640.0, "tb": 21, "ts": 12, "ob": 14, "os": 23, "tb_usd": 645.0, "ts_usd": 472.0, "ob_usd": 534.0, "os_usd": 691.0}, {"sec": 1500, "mcap": 33984.0, "tb": 22, "ts": 10, "ob": 18, "os": 30, "tb_usd": 710.0, "ts_usd": 490.0, "ob_usd": 733.0, "os_usd": 931.0}, {"sec": 1530, "mcap": 34146.0, "tb": 17, "ts": 11, "ob": 15, "os": 22, "tb_usd": 336.0, "ts_usd": 518.0, "ob_usd": 566.0, "os_usd": 380.0}, {"sec": 1560, "mcap": 34342.0, "tb": 24, "ts": 10, "ob": 16, "os": 30, "tb_usd": 431.0, "ts_usd": 365.0, "ob_usd": 402.0, "os_usd": 455.0}, {"sec": 1590, "mcap": 34518.0, "tb": 20, "ts": 11, "ob": 20, "os": 29, "tb_usd": 463.0, "ts_usd": 366.0, "ob_usd": 543.0, "os_usd": 623.0}, {"sec": 1620, "mcap": 34001.0, "tb": 22, "ts": 11, "ob": 13, "os": 24, "tb_usd": 506.0, "ts_usd": 482.0, "ob_usd": 548.0, "os_usd": 559.0}, {"sec": 1650, "mcap": 35052.0, "tb": 19, "ts": 11, "ob": 16, "os": 24, "tb_usd": 607.0, "ts_usd": 461.0, "ob_usd": 511.0, "os_usd": 642.0}, {"sec": 1680, "mcap": 35209.0, "tb": 24, "ts": 12, "ob": 16, "os": 28, "tb_usd": 628.0, "ts_usd": 539.0, "ob_usd": 609.0, "os_usd": 637.0}, {"sec": 1710, "mcap": 35716.0, "tb": 20, "ts": 10, "ob": 13, "os": 23, "tb_usd": 407.0, "ts_usd": 370.0, "ob_usd": 527.0, "os_usd": 549.0}, {"sec": 1740, "mcap": 35406.0, "tb": 18, "ts": 13, "ob": 22, "os": 27, "tb_usd": 366.0, "ts_usd": 364.0, "ob_usd": 490.0, "os_usd": 477.0}, {"sec": 1770, "mcap": 36071.0, "tb": 20, "ts": 12, "ob": 15, "os": 23, "tb_usd": 593.0, "ts_usd": 528.0, "ob_usd": 650.0, "os_usd": 697.0}, {"sec": 1800, "mcap": 36449.0, "tb": 24, "ts": 9, "ob": 16, "os": 31, "tb_usd": 332.0, "ts_usd": 365.0, "ob_usd": 488.0, "os_usd": 440.0}, {"sec": 1830, "mcap": 35997.0, "tb": 24, "ts": 10, "ob": 21, "os": 35, "tb_usd": 653.0, "ts_usd": 436.0, "ob_usd": 696.0, "os_usd": 890.0}, {"sec": 1860, "mcap": 37774.0, "tb": 19, "ts": 11, "ob": 14, "os": 22, "tb_usd": 472.0, "ts_usd": 364.0, "ob_usd": 403.0, "os_usd": 499.0}, {"sec": 1890, "mcap": 36889.0, "tb": 27, "ts": 16, "ob": 21, "os": 32, "tb_usd": 503.0, "ts_usd": 725.0, "ob_usd": 860.0, "os_usd": 618.0}, {"sec": 1920, "mcap": 37627.0, "tb": 21, "ts": 10, "ob": 14, "os": 25, "tb_usd": 370.0, "ts_usd": 94.0, "ob_usd": 155.0, "os_usd": 423.0}, {"sec": 1950, "mcap": 36879.0, "tb": 16, "ts": 8, "ob": 22, "os": 31, "tb_usd": 266.0, "ts_usd": 532.0, "ob_usd": 831.0, "os_usd": 550.0}, {"sec": 1980, "mcap": 36606.0, "tb": 19, "ts": 11, "ob": 20, "os": 28, "tb_usd": 754.0, "ts_usd": 474.0, "ob_usd": 591.0, "os_usd": 852.0}, {"sec": 2010, "mcap": 36267.0, "tb": 13, "ts": 13, "ob": 22, "os": 22, "tb_usd": 275.0, "ts_usd": 512.0, "ob_usd": 723.0, "os_usd": 470.0}, {"sec": 2040, "mcap": 37899.0, "tb": 23, "ts": 11, "ob": 17, "os": 29, "tb_usd": 262.0, "ts_usd": 35.0, "ob_usd": 90.0, "os_usd": 311.0}, {"sec": 2070, "mcap": 37911.0, "tb": 11, "ts": 6, "ob": 8, "os": 13, "tb_usd": 167.0, "ts_usd": 90.0, "ob_usd": 166.0, "os_usd": 237.0}, {"sec": 2100, "mcap": 37234.0, "tb": 27, "ts": 19, "ob": 40, "os": 48, "tb_usd": 230.0, "ts_usd": 567.0, "ob_usd": 1951.0, "os_usd": 1564.0}, {"sec": 2130, "mcap": 27458.0, "tb": 21, "ts": 8, "ob": 31, "os": 44, "tb_usd": 553.0, "ts_usd": 308.0, "ob_usd": 1126.0, "os_usd": 1336.0}, {"sec": 2160, "mcap": 30679.0, "tb": 22, "ts": 12, "ob": 20, "os": 30, "tb_usd": 502.0, "ts_usd": 582.0, "ob_usd": 658.0, "os_usd": 558.0}, {"sec": 2190, "mcap": 30646.0, "tb": 23, "ts": 7, "ob": 10, "os": 26, "tb_usd": 594.0, "ts_usd": 236.0, "ob_usd": 380.0, "os_usd": 725.0}, {"sec": 2220, "mcap": 31438.0, "tb": 12, "ts": 15, "ob": 21, "os": 19, "tb_usd": 490.0, "ts_usd": 569.0, "ob_usd": 766.0, "os_usd": 704.0}, {"sec": 2250, "mcap": 29590.0, "tb": 14, "ts": 11, "ob": 17, "os": 20, "tb_usd": 281.0, "ts_usd": 438.0, "ob_usd": 530.0, "os_usd": 362.0}, {"sec": 2280, "mcap": 30973.0, "tb": 17, "ts": 9, "ob": 10, "os": 18, "tb_usd": 609.0, "ts_usd": 398.0, "ob_usd": 414.0, "os_usd": 611.0}, {"sec": 2310, "mcap": 30698.0, "tb": 26, "ts": 11, "ob": 13, "os": 28, "tb_usd": 430.0, "ts_usd": 475.0, "ob_usd": 500.0, "os_usd": 442.0}, {"sec": 2340, "mcap": 30339.0, "tb": 19, "ts": 13, "ob": 17, "os": 23, "tb_usd": 367.0, "ts_usd": 389.0, "ob_usd": 429.0, "os_usd": 395.0}, {"sec": 2370, "mcap": 30056.0, "tb": 18, "ts": 13, "ob": 17, "os": 22, "tb_usd": 577.0, "ts_usd": 468.0, "ob_usd": 526.0, "os_usd": 620.0}, {"sec": 2400, "mcap": 29800.0, "tb": 15, "ts": 10, "ob": 13, "os": 18, "tb_usd": 424.0, "ts_usd": 337.0, "ob_usd": 452.0, "os_usd": 526.0}, {"sec": 2430, "mcap": 29015.0, "tb": 18, "ts": 14, "ob": 18, "os": 22, "tb_usd": 494.0, "ts_usd": 600.0, "ob_usd": 646.0, "os_usd": 523.0}, {"sec": 2460, "mcap": 30007.0, "tb": 24, "ts": 13, "ob": 14, "os": 25, "tb_usd": 536.0, "ts_usd": 442.0, "ob_usd": 450.0, "os_usd": 531.0}, {"sec": 2490, "mcap": 29984.0, "tb": 23, "ts": 9, "ob": 13, "os": 26, "tb_usd": 420.0, "ts_usd": 365.0, "ob_usd": 406.0, "os_usd": 439.0}, {"sec": 2520, "mcap": 29888.0, "tb": 21, "ts": 12, "ob": 17, "os": 26, "tb_usd": 436.0, "ts_usd": 434.0, "ob_usd": 457.0, "os_usd": 440.0}, {"sec": 2550, "mcap": 30101.0, "tb": 18, "ts": 11, "ob": 14, "os": 21, "tb_usd": 663.0, "ts_usd": 413.0, "ob_usd": 430.0, "os_usd": 666.0}, {"sec": 2580, "mcap": 30360.0, "tb": 18, "ts": 13, "ob": 14, "os": 19, "tb_usd": 316.0, "ts_usd": 505.0, "ob_usd": 535.0, "os_usd": 334.0}, {"sec": 2610, "mcap": 30239.0, "tb": 17, "ts": 10, "ob": 14, "os": 21, "tb_usd": 574.0, "ts_usd": 435.0, "ob_usd": 592.0, "os_usd": 715.0}, {"sec": 2640, "mcap": 30535.0, "tb": 17, "ts": 14, "ob": 16, "os": 19, "tb_usd": 559.0, "ts_usd": 550.0, "ob_usd": 562.0, "os_usd": 559.0}, {"sec": 2670, "mcap": 8840.0, "tb": 7, "ts": 107, "ob": 121, "os": 21, "tb_usd": 292.0, "ts_usd": 6590.0, "ob_usd": 6736.0, "os_usd": 322.0}, {"sec": 2700, "mcap": 2953.0, "tb": 0, "ts": 0, "ob": 11, "os": 12, "tb_usd": 0, "ts_usd": 0, "ob_usd": 122.0, "os_usd": 116.0}, {"sec": 2730, "mcap": 2903.0, "tb": 0, "ts": 0, "ob": 9, "os": 9, "tb_usd": 0, "ts_usd": 0, "ob_usd": 20.0, "os_usd": 18.0}, {"sec": 2760, "mcap": 3006.0, "tb": 0, "ts": 0, "ob": 5, "os": 4, "tb_usd": 0, "ts_usd": 0, "ob_usd": 173.0, "os_usd": 139.0}, {"sec": 2790, "mcap": 29455.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0.0}, {"sec": 2820, "mcap": 3018.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 20.0, "os_usd": 19.0}, {"sec": 2850, "mcap": 2959.0, "tb": 0, "ts": 0, "ob": 3, "os": 3, "tb_usd": 0, "ts_usd": 0, "ob_usd": 19.0, "os_usd": 18.0}, {"sec": 2880, "mcap": 2960.0, "tb": 0, "ts": 0, "ob": 2, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 2.0, "os_usd": 1.0}, {"sec": 2910, "mcap": 2957.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 3.0, "os_usd": 3.0}, {"sec": 2940, "mcap": 2940.0, "tb": 0, "ts": 0, "ob": 3, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 17.0, "os_usd": 2.0}, {"sec": 3030, "mcap": 2907.0, "tb": 0, "ts": 0, "ob": 2, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 10.0, "os_usd": 8.0}, {"sec": 3150, "mcap": 2900.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 1.0, "os_usd": 1.0}, {"sec": 3180, "mcap": 8242.0, "tb": 0, "ts": 0, "ob": 2, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 1.0}, {"sec": 3240, "mcap": 2896.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 2.0, "os_usd": 2.0}, {"sec": 3360, "mcap": 2893.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 1.0, "os_usd": 1.0}, {"sec": 3510, "mcap": 2889.0, "tb": 0, "ts": 0, "ob": 1, "os": 0, "tb_usd": 0, "ts_usd": 0, "ob_usd": 2.0, "os_usd": 0}, {"sec": 3780, "mcap": 2885.0, "tb": 0, "ts": 0, "ob": 2, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 1.0, "os_usd": 1.0}, {"sec": 3930, "mcap": 37692.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 1.0}, {"sec": 3960, "mcap": 2859.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 26.0, "os_usd": 25.0}, {"sec": 4020, "mcap": 2831.0, "tb": 0, "ts": 0, "ob": 2, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 2.0, "os_usd": 2.0}, {"sec": 4200, "mcap": 37746.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 1.0}, {"sec": 4260, "mcap": 2829.0, "tb": 0, "ts": 0, "ob": 2, "os": 2, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0.0}, {"sec": 4350, "mcap": 2829.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 1.0, "os_usd": 0.0}, {"sec": 4620, "mcap": 2828.0, "tb": 0, "ts": 0, "ob": 1, "os": 1, "tb_usd": 0, "ts_usd": 0, "ob_usd": 0.0, "os_usd": 0.0}], "zones_t2": {"A": {"nb": 0, "ns": 49, "label": "<$8k", "b_usd_p50": 0, "s_usd_p50": 35, "b_tok_p50": 0, "s_tok_p50": 6910506}, "B": {"nb": 54, "ns": 39, "label": "$8k-$18k", "b_usd_p50": 86, "s_usd_p50": 62, "b_tok_p50": 5421594, "s_tok_p50": 5316304}, "C": {"nb": 468, "ns": 309, "label": "$18k-$28k", "b_usd_p50": 25, "s_usd_p50": 38, "b_tok_p50": 1110161, "s_tok_p50": 1610420}, "D": {"nb": 1101, "ns": 686, "label": "$28k-$38k", "b_usd_p50": 13, "s_usd_p50": 37, "b_tok_p50": 389093, "s_tok_p50": 1148905}, "E": {"nb": 79, "ns": 3, "label": ">$38k", "b_usd_p50": 1, "s_usd_p50": 0, "b_tok_p50": 23764, "s_tok_p50": 57}}, "wallets_t2": [{"w": "Wallet_16", "b": 17, "s": 19, "b_usd": 564.0, "s_usd": 728.6, "net": 164.7, "b_mc": 32600.0, "s_mc": 36100.0}, {"w": "Wallet_39", "b": 18, "s": 14, "b_usd": 548.7, "s_usd": 631.2, "net": 82.4, "b_mc": 32200.0, "s_mc": 30200.0}, {"w": "Wallet_55", "b": 19, "s": 10, "b_usd": 604.1, "s_usd": 656.8, "net": 52.7, "b_mc": 30800.0, "s_mc": 28200.0}, {"w": "Wallet_26", "b": 16, "s": 12, "b_usd": 434.0, "s_usd": 472.7, "net": 38.7, "b_mc": 30800.0, "s_mc": 29800.0}, {"w": "Wallet_34", "b": 27, "s": 14, "b_usd": 472.8, "s_usd": 511.1, "net": 38.3, "b_mc": 30600.0, "s_mc": 30400.0}, {"w": "Wallet_45", "b": 17, "s": 15, "b_usd": 689.3, "s_usd": 725.2, "net": 35.9, "b_mc": 31600.0, "s_mc": 30100.0}, {"w": "Wallet_31", "b": 20, "s": 9, "b_usd": 481.2, "s_usd": 516.0, "net": 34.7, "b_mc": 31700.0, "s_mc": 33800.0}, {"w": "Wallet_91", "b": 19, "s": 8, "b_usd": 367.0, "s_usd": 399.8, "net": 32.8, "b_mc": 30200.0, "s_mc": 30800.0}, {"w": "Wallet_94", "b": 15, "s": 10, "b_usd": 626.1, "s_usd": 655.1, "net": 29.0, "b_mc": 29700.0, "s_mc": 26900.0}, {"w": "Wallet_68", "b": 23, "s": 10, "b_usd": 733.3, "s_usd": 760.4, "net": 27.1, "b_mc": 30800.0, "s_mc": 30100.0}, {"w": "Wallet_82", "b": 19, "s": 14, "b_usd": 593.8, "s_usd": 618.2, "net": 24.4, "b_mc": 31800.0, "s_mc": 32600.0}, {"w": "Wallet_37", "b": 12, "s": 8, "b_usd": 400.6, "s_usd": 409.2, "net": 8.7, "b_mc": 33200.0, "s_mc": 34400.0}, {"w": "Wallet_76", "b": 18, "s": 13, "b_usd": 595.9, "s_usd": 602.1, "net": 6.1, "b_mc": 30900.0, "s_mc": 29900.0}, {"w": "Wallet_88", "b": 16, "s": 8, "b_usd": 390.0, "s_usd": 393.3, "net": 3.3, "b_mc": 31100.0, "s_mc": 29100.0}, {"w": "Wallet_81", "b": 14, "s": 12, "b_usd": 594.5, "s_usd": 597.4, "net": 2.9, "b_mc": 31300.0, "s_mc": 32800.0}, {"w": "Wallet_2", "b": 12, "s": 12, "b_usd": 468.3, "s_usd": 468.9, "net": 0.6, "b_mc": 30700.0, "s_mc": 30500.0}, {"w": "Wallet_52", "b": 17, "s": 11, "b_usd": 365.7, "s_usd": 365.2, "net": -0.5, "b_mc": 33600.0, "s_mc": 30200.0}, {"w": "Wallet_98", "b": 21, "s": 14, "b_usd": 542.8, "s_usd": 537.5, "net": -5.3, "b_mc": 30500.0, "s_mc": 30900.0}, {"w": "Wallet_79", "b": 15, "s": 10, "b_usd": 475.7, "s_usd": 468.4, "net": -7.3, "b_mc": 29600.0, "s_mc": 30700.0}, {"w": "Wallet_96", "b": 15, "s": 11, "b_usd": 428.6, "s_usd": 419.1, "net": -9.4, "b_mc": 31400.0, "s_mc": 29700.0}, {"w": "Wallet_65", "b": 18, "s": 8, "b_usd": 441.6, "s_usd": 430.9, "net": -10.6, "b_mc": 30800.0, "s_mc": 21300.0}, {"w": "Wallet_13", "b": 14, "s": 13, "b_usd": 650.7, "s_usd": 632.0, "net": -18.8, "b_mc": 33300.0, "s_mc": 32700.0}, {"w": "Wallet_33", "b": 15, "s": 11, "b_usd": 375.5, "s_usd": 348.2, "net": -27.3, "b_mc": 31300.0, "s_mc": 29800.0}, {"w": "Wallet_89", "b": 14, "s": 11, "b_usd": 487.9, "s_usd": 460.1, "net": -27.9, "b_mc": 33300.0, "s_mc": 30000.0}, {"w": "Wallet_69", "b": 16, "s": 13, "b_usd": 490.9, "s_usd": 462.7, "net": -28.2, "b_mc": 32600.0, "s_mc": 29800.0}], "iv_t1": {"p10": 18, "p25": 36, "p50": 71, "p75": 120, "p90": 181}, "iv_t2": {"p10": 16, "p25": 32, "p50": 66, "p75": 115, "p90": 184}, "lag_buy_t2": {"p25": 15, "p50": 30, "p75": 45}, "lag_sell_t2": {"p25": 1, "p50": 1, "p75": 27}, "deal_sizes": {"t1_buy_p50": 40.6, "t1_sell_p50": 73.7, "t2_buy_p50": 15.5, "t2_sell_p50": 37.0, "t1_buy_p90": 136.6, "t2_buy_p90": 85.8}, "sol_usd": 92.27, "overlap_wallets": 100, "total_team": 131, "t1_migrate_usd": 67790, "t2_migrate_usd": 34540};
+
+// ===== OVERVIEW STATS =====
+const ov=document.getElementById('stats-overview');
+ov.innerHTML=[
+  {l:'Совпадающих кошельков',v:'100 / 131',s:'на обоих токенах'},
+  {l:'Интервал между сделками p50',v:'66–71 с',s:'одинаков на обоих'},
+  {l:'Реакция на org BUY p50',v:'30 с',s:'подтверждено ×2'},
+  {l:'BUY : SELL соотношение $',v:'1 : 2×',s:'постоянный спред'},
+  {l:'Дамп за 1 слот',v:'60–91',s:'кошельков синхронно'},
+  {l:'Масштаб сделок',v:'∝ MC',s:'0.06% / 0.11%'},
 ].map(s=>`<div class="stat"><div class="stat-label">${s.l}</div><div class="stat-val">${s.v}</div><div class="stat-sub">${s.s}</div></div>`).join('');
 
-// Timeline chart — show first 60 bins (30 min) to avoid long tail
-const tl = DATA.timeline.filter(x=>x.sec<=1800 && (x.tb+x.ts+x.ob+x.os)>0);
-const labels = tl.map(x=>{const m=Math.floor(x.sec/60);const s=x.sec%60;return `${m}:${String(s).padStart(2,'0')}`;});
-const ctx = document.getElementById('chartTimeline').getContext('2d');
-new Chart(ctx,{
+// ===== DEAL SIZE COMPARISON =====
+new Chart(document.getElementById('chartDealSizes').getContext('2d'),{
   type:'bar',
-  data:{labels,datasets:[
-    {type:'line',label:'Market Cap ($)',data:tl.map(x=>x.mcap),borderColor:'#00c4ff',backgroundColor:'transparent',tension:0.3,pointRadius:0,borderWidth:2.5,yAxisID:'y2',order:0},
-    {label:'Team BUY ($)',data:tl.map(x=>x.tb_usd),backgroundColor:'rgba(0,229,122,0.65)',yAxisID:'y',order:1},
-    {label:'Team SELL ($)',data:tl.map(x=>-x.ts_usd),backgroundColor:'rgba(255,79,106,0.65)',yAxisID:'y',order:1},
-    {label:'Org BUY (×0.5)',data:tl.map(x=>x.ob_usd*0.5),backgroundColor:'rgba(0,180,90,0.15)',yAxisID:'y',order:2},
-    {label:'Org SELL (×0.5)',data:tl.map(x=>-x.os_usd*0.5),backgroundColor:'rgba(255,79,106,0.1)',yAxisID:'y',order:2},
-  ]},
-  options:{
-    responsive:true,maintainAspectRatio:true,
-    interaction:{mode:'index',intersect:false},
-    plugins:{
-      legend:{labels:{color:'#6b7a8f',font:{size:11}}},
-      tooltip:{callbacks:{label:ctx=>{const v=ctx.parsed.y;return `${ctx.dataset.label}: $${Math.abs(v).toLocaleString('en',{maximumFractionDigits:0})}`;}}}
-    },
-    scales:{
-      x:{ticks:{color:'#6b7a8f',maxRotation:0,font:{size:10},maxTicksLimit:18},grid:{color:'#1a1f2a'}},
-      y:{ticks:{color:'#6b7a8f',font:{size:10},callback:v=>'$'+Math.abs(v).toLocaleString()},grid:{color:'#1a1f2a'},title:{display:true,text:'Volume ($)',color:'#6b7a8f'}},
-      y2:{position:'right',ticks:{color:'#00c4ff',font:{size:10},callback:v=>'$'+v.toLocaleString()},grid:{display:false},title:{display:true,text:'Market Cap ($)',color:'#00c4ff'}}
-    }
-  }
+  data:{labels:['T1 BUY','T1 SELL','T2 BUY','T2 SELL'],
+    datasets:[{label:'p50 ($)',data:[40.6,73.7,15.5,37.0],
+      backgroundColor:['rgba(0,229,122,.7)','rgba(255,79,106,.7)','rgba(0,229,122,.4)','rgba(255,79,106,.4)'],
+      borderRadius:4}]},
+  options:{responsive:true,plugins:{legend:{display:false}},
+    scales:{x:{ticks:{color:'#6b7a8f'}},y:{ticks:{color:'#6b7a8f',callback:v=>'$'+v},grid:{color:'#1a1f2a'}}}}
 });
 
-// Zone grid
-const zoneClass={A:'za',B:'zb',C:'zc',D:'zd',E:'ze'};
-const zg = document.getElementById('zoneGrid');
-for(const z of ['A','B','C','D','E']){
-  const d = DATA.zones[z]||{nb:0,ns:0,b_usd_p50:0,s_usd_p50:0,b_tok_p50:0,s_tok_p50:0,label:z};
-  zg.innerHTML+=`<div class="zone-card ${zoneClass[z]}">
-    <div class="zone-mc">${d.label}</div>
-    <div class="zone-n buy">${d.nb} BUY</div>
-    <div class="zone-n sell">${d.ns} SELL</div>
-    <div class="zone-detail">BUY p50: $${d.b_usd_p50}<br>SELL p50: $${d.s_usd_p50}</div>
-    <div class="zone-detail">${((d.b_tok_p50||0)/1e6).toFixed(1)}M → ${((d.s_tok_p50||0)/1e6).toFixed(1)}M tok</div>
-  </div>`;
-}
+// ===== TIMING BARS =====
+const timingCtx=document.getElementById('chartTiming').getContext('2d');
+new Chart(timingCtx,{
+  type:'bar',
+  data:{
+    labels:['p10','p25','p50','p75','p90'],
+    datasets:[
+      {label:'T1 интервал (с)',data:[18,36,71,120,181],backgroundColor:'rgba(0,196,255,.6)',borderRadius:3},
+      {label:'T2 интервал (с)',data:[16,32,66,115,184],backgroundColor:'rgba(0,229,122,.6)',borderRadius:3},
+      {label:'Лаг org→team BUY (с)',data:[null,15,30,45,null],backgroundColor:'rgba(255,201,60,.5)',borderRadius:3},
+    ]
+  },
+  options:{responsive:true,plugins:{legend:{labels:{color:'#6b7a8f',font:{size:10}}}},
+    scales:{x:{ticks:{color:'#6b7a8f'}},y:{ticks:{color:'#6b7a8f'},grid:{color:'#1a1f2a'}}}}
+});
 
-// Wallet table
-const roleLabel={sniper:'<span class="badge b-sniper">SNIPER</span>',mm:'<span class="badge b-mm">MM-BOT</span>',passive:'<span class="badge b-passive">PASSIVE</span>'};
-const wt = document.getElementById('walletTable');
+// ===== ZONE COMPARISON =====
+const t1zones_raw={A:{nb:142,ns:107},B:{nb:443,ns:255},C:{nb:115,ns:127},D:{nb:198,ns:158}};
+const t2zones_raw=T2DATA.zones_t2;
+const zLabels=['<20%','20-40%','40-55%','55-70%','70-100%'];
+const zT1=[107/(142||1),255/(443||1),127/(115||1),158/(198||1),0];
+const zT2=[
+  (t2zones_raw.B?.ns||0)/((t2zones_raw.B?.nb||1)),
+  (t2zones_raw.C?.ns||0)/((t2zones_raw.C?.nb||1)),
+  (t2zones_raw.D?.ns||0)/((t2zones_raw.D?.nb||1)),
+  0,0
+];
+new Chart(document.getElementById('chartZones').getContext('2d'),{
+  type:'bar',
+  data:{labels:['Зона 1 (низ)','Зона 2','Зона 3','Зона 4 (верх)'],
+    datasets:[
+      {label:'T1 SELL/BUY',data:zT1.slice(0,4).map(v=>+(v).toFixed(2)),backgroundColor:'rgba(0,196,255,.6)',borderRadius:3},
+      {label:'T2 SELL/BUY',data:zT2.slice(0,4).map(v=>+(v).toFixed(2)),backgroundColor:'rgba(0,229,122,.6)',borderRadius:3},
+    ]},
+  options:{responsive:true,plugins:{legend:{labels:{color:'#6b7a8f',font:{size:10}}}},
+    scales:{x:{ticks:{color:'#6b7a8f',font:{size:10}}},y:{ticks:{color:'#6b7a8f',callback:v=>v+'×'},grid:{color:'#1a1f2a'},
+      title:{display:true,text:'ratio SELL/BUY',color:'#6b7a8f'}}}}
+});
+
+// ===== T1 CHART =====
+function makeTimelineChart(canvasId, tl, lineColor){
+  const filtered=tl.filter(x=>x.sec<=1800&&(x.tb+x.ts+x.ob+x.os)>0);
+  const labs=filtered.map(x=>{const m=Math.floor(x.sec/60);const s=x.sec%60;return `${m}:${String(s).padStart(2,'0')}`;});
+  new Chart(document.getElementById(canvasId).getContext('2d'),{
+    type:'bar',
+    data:{labels:labs,datasets:[
+      {type:'line',label:'MC ($)',data:filtered.map(x=>x.mcap),borderColor:lineColor,backgroundColor:'transparent',tension:0.3,pointRadius:0,borderWidth:2,yAxisID:'y2',order:0},
+      {label:'Team BUY ($)',data:filtered.map(x=>x.tb_usd),backgroundColor:'rgba(0,229,122,.65)',yAxisID:'y',order:1},
+      {label:'Team SELL ($)',data:filtered.map(x=>-x.ts_usd),backgroundColor:'rgba(255,79,106,.65)',yAxisID:'y',order:1},
+      {label:'Org BUY ×0.5',data:filtered.map(x=>x.ob_usd*.5),backgroundColor:'rgba(0,180,90,.12)',yAxisID:'y',order:2},
+      {label:'Org SELL ×0.5',data:filtered.map(x=>-x.os_usd*.5),backgroundColor:'rgba(255,79,106,.07)',yAxisID:'y',order:2},
+    ]},
+    options:{responsive:true,maintainAspectRatio:true,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{labels:{color:'#6b7a8f',font:{size:10}}},
+        tooltip:{callbacks:{label:c=>`${c.dataset.label}: $${Math.abs(c.parsed.y).toLocaleString('en',{maximumFractionDigits:0})}`}}},
+      scales:{x:{ticks:{color:'#6b7a8f',maxRotation:0,font:{size:9},maxTicksLimit:16},grid:{color:'#1a1f2a'}},
+        y:{ticks:{color:'#6b7a8f',font:{size:9},callback:v=>'$'+Math.abs(v).toLocaleString()},grid:{color:'#1a1f2a'}},
+        y2:{position:'right',ticks:{color:lineColor,font:{size:9},callback:v=>'$'+v.toLocaleString()},grid:{display:false}}}}
+  });
+}
+makeTimelineChart('chartT1',T1DATA.timeline,'#00c4ff');
+makeTimelineChart('chartT2',T2DATA.timeline2,'#00e57a');
+
+// ===== ZONE TABLES =====
+function makeZoneTable(containerId, zones, labels){
+  const el=document.getElementById(containerId);
+  let html='<table><tr><th>Зона MC</th><th>BUY n</th><th>BUY p50 $</th><th>BUY M tok</th><th>SELL n</th><th>SELL p50 $</th><th>SELL M tok</th><th>S/B</th><th>Режим</th></tr>';
+  for(const z of Object.keys(zones)){
+    const d=zones[z]; const ratio=d.ns/(d.nb||1); const mode=ratio<0.7?'Накопление':ratio>1.1?'Дистрибуция':'Нейтральный';
+    const mc=ratio<0.7?'buy':ratio>1.1?'sell':'net';
+    html+=`<tr><td>${d.label}</td><td class="buy">${d.nb}</td><td class="buy">$${d.b_usd_p50}</td><td>${((d.b_tok_p50||0)/1e6).toFixed(1)}M</td>
+      <td class="sell">${d.ns}</td><td class="sell">$${d.s_usd_p50}</td><td>${((d.s_tok_p50||0)/1e6).toFixed(1)}M</td>
+      <td class="${mc}">${ratio.toFixed(2)}</td><td class="${mc}">${mode}</td></tr>`;
+  }
+  el.innerHTML=html+'</table>';
+}
+makeZoneTable('zonesT1',T1DATA.zones,null);
+makeZoneTable('zonesT2',T2DATA.zones_t2,null);
+
+// ===== PARAMS =====
+const params=[
+  {name:'DEAL_INTERVAL_MIN',val:'16 с',note:'p10 интервала между сделками (T1+T2)'},
+  {name:'DEAL_INTERVAL_P50',val:'66–71 с',note:'медиана интервала, оба токена'},
+  {name:'DEAL_INTERVAL_MAX',val:'184 с',note:'p90 интервала (3 мин)'},
+  {name:'REACT_DELAY_MIN',val:'1 с',note:'минимальная задержка реакции'},
+  {name:'REACT_DELAY_P50',val:'30 с',note:'медиана реакции на org BUY'},
+  {name:'REACT_DELAY_MAX',val:'45 с',note:'p75 реакции'},
+  {name:'BUY_SIZE_PCT',val:'0.060%',note:'от текущего MC → размер BUY'},
+  {name:'SELL_SIZE_PCT',val:'0.110%',note:'от текущего MC → размер SELL'},
+  {name:'WALLETS_ACTIVE',val:'100–131',note:'из пула командных кошельков'},
+  {name:'LARGE_ORG_THRESHOLD',val:'top 12%',note:'порог "крупной" органики'},
+  {name:'WARMUP_DURATION',val:'0–3 мин',note:'только BUY в начале'},
+  {name:'EXIT_THRESHOLD',val:'≥95% target MC',note:'сигнал на синхронный выход'},
+  {name:'EXIT_WALLETS',val:'60–91',note:'кошельков в одном слоте'},
+  {name:'EXIT_DURATION',val:'30–60 с',note:'от первого до последнего SELL'},
+];
+const pg=document.getElementById('paramGrid');
+params.forEach(p=>{pg.innerHTML+=`<div class="param"><div class="param-name">${p.name}</div><div class="param-val">${p.val}</div><div class="param-note">${p.note}</div></div>`;});
+
+// ===== TZ LIST =====
+const tzItems=[
+  {title:'Пул кошельков',body:'131 командный кошелёк, разделить на 3 группы: Snipers (~30), MM-активные (~98), Резерв (~3). 100 кошельков используются на каждый запуск. Каждый кошелёк имеет SOL для 20-30 сделок. Перед запуском: пополнить все кошельки с мастер-wallet.'},
+  {title:'Seed-фаза (T+0 сек)',body:'Запустить 25-30 sniper-кошельков. Каждый покупает 0.06-0.07 SOL (~$5-7). Задержка между снайперами: random(0.5s, 3s). Цель: зайти при MC $500-$5k. ВАЖНО: НЕ сообщать снайперов с MM-кошельками в блоке — разные слоты.'},
+  {title:'Прогрев 0-3 мин: только BUY',body:'Первые 2-3 минуты — только покупки, никаких SELL. Активировать 40-60 кошельков. BUY size = MC × 0.06%. Интервал между активациями: random(16s, 45s). Создаём давление вверх, имитируем раннюю органику.'},
+  {title:'MM-цикл: интервал сделок',body:'Между сделками одного кошелька: random.uniform(16, 184) сек, с распределением около p50=66с. Реализация: каждый кошелёк хранит next_action_time = now + random_interval(). random_interval() = clip(normal(66, 40), 16, 184).'},
+  {title:'MM-цикл: размер BUY',body:'buy_sol = (current_MC_sol / SUPPLY) × SUPPLY × BUY_PCT / SOL_USD. Проще: buy_usd = current_MC_usd × 0.00060. Конвертировать в SOL: buy_sol = buy_usd / sol_price. Минимум: 0.01 SOL. Максимум: 0.3 SOL.'},
+  {title:'MM-цикл: размер SELL',body:'sell_usd = current_MC_usd × 0.00110. В токенах: sell_tok = sell_usd / current_price_usd. Дробить: если sell_tok > 2M → разбить на 2-3 транзакции в разных слотах (интервал 1-3 слота). НИКОГДА не ставить в одном слоте крупный sell без сопутствующих buy от других кошельков.'},
+  {title:'Реакция на крупный org BUY',body:'Мониторить org_buy_volume за последние 60 сек. Если новый org BUY ≥ p88 исторического объёма → ждать random(1, 45) сек (p50=30с) → BUY от 1-3 кошельков по BUY_SIZE. Цель: усилить импульс, поднять цену.'},
+  {title:'Реакция на крупный org SELL',body:'Если org SELL ≥ p88 → ждать random(1, 45) сек → BUY от 1-3 кошельков, поглощаем давление. В 25% случаев также SELL от 1 кошелька — "выглядит как органика". Размер поглощения: BUY_SIZE × 1.5.'},
+  {title:'Зона накопления vs дистрибуции',body:'MC < 60% от target: режим ACCUMULATE (BUY активнее чем SELL, ratio 0.55-0.72). MC 60-85% от target: режим NEUTRAL (равный BUY/SELL). MC > 85% от target: режим DISTRIBUTE (SELL активнее, ratio 1.0-1.1). Автоматически переключается по текущему MC.'},
+  {title:'Синхронный дамп (EXIT)',body:'Условие выхода: (MC ≥ EXIT_MC_TARGET) AND (org_activity_last_2min < p25). Сигнал: broadcast всем кошелькам через общую очередь. Каждый кошелёк выполняет SELL всего остатка токенов. Задержка от сигнала: random(0, 3) сек. Целевые слоты: подряд, 1-2 слота. Итог: 60-91 транзакция за 30-60 сек.'},
+  {title:'Distribution pattern (анти-whale)',body:'При SELL > 5M токенов за один раз → разбить на 3-5 кошельков-покупателей в том же слоте. Схема: wallet_A SELL 10M → wallet_B BUY 3.3M + wallet_C BUY 3.3M + wallet_D BUY 3.4M. Ни один новый холдер не получает >1% supply. Скрывает крупного продавца в топе холдеров.'},
+  {title:'Параметры рандомизации',body:'Все задержки — uniform distribution (равномерная), НЕ fixed. Это критично для обхода детекторов. Никогда не использовать: fixed interval, round numbers (30с, 60с). Использовать: random.uniform(a, b) где a и b берутся из таблицы выше.'},
+];
+const tzEl=document.getElementById('tzList');
+tzItems.forEach((item,i)=>{
+  tzEl.innerHTML+=`<div class="tz-item">
+    <div class="tz-num">${i+1}</div>
+    <div class="tz-body"><h3>${item.title}</h3><p>${item.body}</p></div>
+  </div>`;
+});
+
+// ===== WALLET TABLE T2 =====
+const wt2=document.getElementById('walletTableT2');
 const fmt=n=>'$'+Math.round(n).toLocaleString();
-const fmtmc=n=>n>1000?'$'+Math.round(n/1000)+'k':'$'+n;
-DATA.wallets.forEach(w=>{
-  const nc = w.net>0?'buy':'sell';
-  wt.innerHTML+=`<tr>
-    <td>${w.w}</td><td>${roleLabel[w.role]||w.role}</td>
+const fmtmc=n=>n>=1000?'$'+Math.round(n/1000)+'k':'$'+n;
+T2DATA.wallets_t2.forEach(w=>{
+  const nc=w.net>0?'buy':'sell';
+  wt2.innerHTML+=`<tr><td>${w.w}</td>
     <td class="buy">${w.b}</td><td class="buy">${fmt(w.b_usd)}</td><td>${fmtmc(w.b_mc)}</td>
     <td class="sell">${w.s}</td><td class="sell">${fmt(w.s_usd)}</td><td>${fmtmc(w.s_mc)}</td>
-    <td class="${nc}" style="font-weight:600">${w.net>0?'+':''}${fmt(w.net)}</td>
-  </tr>`;
+    <td class="${nc}" style="font-weight:600">${w.net>0?'+':''}${fmt(w.net)}</td></tr>`;
 });
 </script>
 </body>
